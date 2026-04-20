@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[4강] Figma 카드뉴스 제작 — AI 소식 5장</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Inter:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #080F0E;
+    --text: #E0F2F1;
+    --muted: #5A8A85;
+    --teal: #0D9488;
+    --teal2: #14B8A6;
+    --teal3: #5EEAD4;
+    --figma: #F24E1E;
+    --figma2: #FF7262;
+    --purple: #A259FF;
+    --border: rgba(13,148,136,0.28);
+    --card-bg: rgba(13,148,136,0.09);
+    --duration: 420ms;
+    --stagger: 110ms;
+  }
+
+  html, body {
+    width: 100%; height: 100dvh;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #app { position: relative; width: 100%; height: 100dvh; overflow: hidden; }
+
+  /* ── Slides ── */
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transform: translate3d(60px, 0, 0);
+    transition: opacity var(--duration) ease, transform var(--duration) ease;
+    pointer-events: none;
+    padding: 40px 60px;
+  }
+  .slide.active { opacity: 1; transform: translate3d(0, 0, 0); pointer-events: auto; }
+  .slide.exit   { opacity: 0; transform: translate3d(-60px, 0, 0); }
+  @media (prefers-reduced-motion: reduce) { .slide { transition: none; } }
+
+  .step { opacity: 0; transform: translate3d(0, 20px, 0); transition: opacity 0.35s ease, transform 0.35s ease; }
+  .step.visible { opacity: 1; transform: translate3d(0, 0, 0); }
+
+  /* ── Backgrounds ── */
+  .slide-1 { background: radial-gradient(ellipse 80% 65% at 25% 40%, rgba(13,148,136,0.22) 0%, transparent 70%), radial-gradient(ellipse 55% 60% at 80% 70%, rgba(242,78,30,0.10) 0%, transparent 65%), var(--bg); }
+  .slide-2 { background: radial-gradient(ellipse 70% 55% at 75% 35%, rgba(13,148,136,0.16) 0%, transparent 65%), var(--bg); }
+  .slide-3 { background: radial-gradient(ellipse 65% 60% at 20% 65%, rgba(162,89,255,0.12) 0%, transparent 65%), var(--bg); }
+  .slide-4 { background: radial-gradient(ellipse 65% 55% at 70% 25%, rgba(13,148,136,0.18) 0%, transparent 65%), var(--bg); }
+  .slide-5 { background: radial-gradient(ellipse 65% 55% at 20% 40%, rgba(242,78,30,0.12) 0%, transparent 65%), var(--bg); }
+  .slide-6 { background: radial-gradient(ellipse 65% 55% at 70% 60%, rgba(13,148,136,0.15) 0%, transparent 65%), var(--bg); }
+  .slide-7 { background: radial-gradient(ellipse 70% 60% at 25% 50%, rgba(162,89,255,0.12) 0%, transparent 65%), var(--bg); }
+  .slide-8 { background: radial-gradient(ellipse 65% 55% at 70% 35%, rgba(13,148,136,0.14) 0%, transparent 65%), var(--bg); }
+  .slide-9 { background: radial-gradient(ellipse 75% 60% at 40% 55%, rgba(13,148,136,0.16) 0%, transparent 65%), var(--bg); }
+
+  /* ── Layout ── */
+  .content { width: 100%; max-width: 960px; display: flex; flex-direction: column; }
+  .content-wide { max-width: 1100px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+
+  /* ── Typography ── */
+  .label {
+    font-size: clamp(10px, 1.1vw, 13px); font-weight: 500;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--teal2); margin-bottom: 16px;
+  }
+  .label.figma-color { color: var(--figma2); }
+  .title {
+    font-size: clamp(28px, 4.5vw, 56px); font-weight: 700;
+    line-height: 1.15; letter-spacing: -0.02em; color: var(--text); margin-bottom: 10px;
+  }
+  .subtitle {
+    font-size: clamp(18px, 2.5vw, 30px); font-weight: 600;
+    line-height: 1.3; color: var(--text); margin-bottom: 22px;
+  }
+  .body { font-size: clamp(13px, 1.4vw, 17px); line-height: 1.8; color: #94D3CC; }
+  .divider {
+    width: 56px; height: 3px;
+    background: linear-gradient(90deg, var(--teal), var(--figma));
+    border-radius: 2px; margin: 18px 0 26px;
+  }
+
+  /* ── Badge ── */
+  .figma-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(242,78,30,0.12); border: 1px solid rgba(242,78,30,0.28);
+    border-radius: 20px; padding: 5px 14px;
+    font-size: 12px; font-weight: 500; color: var(--figma2); margin-bottom: 18px;
+  }
+  .figma-badge .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--figma2); animation: blink 2s ease infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* ── Callout ── */
+  .callout {
+    background: rgba(13,148,136,0.10); border-left: 3px solid var(--teal2);
+    border-radius: 8px; padding: 14px 20px;
+    font-size: clamp(12px, 1.25vw, 14px); line-height: 1.7; color: #94D3CC; margin-top: 18px;
+  }
+  .callout strong { color: var(--teal3); }
+
+  /* ── Code block ── */
+  .code-block {
+    background: #050D0C; border: 1px solid var(--border); border-radius: 10px;
+    padding: 20px 24px; font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(10px, 1.05vw, 12.5px); line-height: 1.85;
+    color: #5EEAD4; white-space: pre-wrap; overflow: auto; position: relative;
+  }
+  .code-label {
+    position: absolute; top: 10px; right: 14px; font-size: 10px;
+    letter-spacing: 0.1em; color: var(--muted);
+    font-family: 'Inter', sans-serif; text-transform: uppercase;
+  }
+  .code-block .key   { color: #14B8A6; }
+  .code-block .val   { color: #A7F3D0; }
+  .code-block .frame { color: #94A3B8; }
+  .code-block .comment { color: #334E4A; }
+
+  /* ── Table ── */
+  .table-wrap { overflow: auto; border-radius: 10px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: clamp(11px, 1.15vw, 14px); }
+  th {
+    background: rgba(13,148,136,0.20); color: var(--teal3); font-weight: 600;
+    padding: 12px 18px; text-align: left; letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 18px; border-bottom: 1px solid rgba(13,148,136,0.10);
+    color: #94D3CC; vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(13,148,136,0.06); }
+  td strong { color: var(--text); }
+  .chip {
+    display: inline-block; padding: 2px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 500;
+    background: rgba(13,148,136,0.18); color: var(--teal2);
+    border: 1px solid rgba(13,148,136,0.28);
+  }
+  .num-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--teal), var(--figma));
+    font-size: 11px; font-weight: 700; color: white; flex-shrink: 0;
+  }
+
+  /* ── Cards ── */
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 18px;
+  }
+  .card-title {
+    font-size: clamp(12px, 1.2vw, 14px); font-weight: 600;
+    color: var(--teal2); margin-bottom: 8px;
+  }
+  .card-body { font-size: clamp(11px, 1.1vw, 13px); line-height: 1.6; color: #5EAAA4; }
+
+  /* ── Layout preview ── */
+  .layout-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .layout-card {
+    background: rgba(13,148,136,0.08); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; aspect-ratio: 1;
+    display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden;
+  }
+  .layout-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(13,148,136,0.15) 0%, transparent 100%);
+  }
+  .lc-header { font-size: 9px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; font-family: 'Inter', sans-serif; position: relative; }
+  .lc-title { font-size: clamp(11px, 1.1vw, 13px); font-weight: 700; color: var(--teal3); line-height: 1.3; position: relative; }
+  .lc-body { font-size: 9px; color: #4A8A84; line-height: 1.5; position: relative; }
+  .lc-num { position: absolute; top: 10px; right: 12px; font-size: 10px; font-weight: 700; color: rgba(94,234,212,0.4); font-family: 'Inter', sans-serif; }
+
+  /* ── Checklist ── */
+  .checklist { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+  .checklist li {
+    display: flex; align-items: flex-start; gap: 14px;
+    font-size: clamp(13px, 1.4vw, 17px); line-height: 1.5; color: #94D3CC;
+  }
+  .check-box {
+    flex-shrink: 0; width: 22px; height: 22px; border-radius: 6px;
+    border: 2px solid var(--teal); margin-top: 2px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── Progress & UI ── */
+  #progress-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.05); z-index: 100; }
+  #progress-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--figma)); transition: width var(--duration) ease; }
+  #counter { position: fixed; bottom: 16px; right: 24px; font-size: 12px; font-weight: 500; color: var(--muted); font-family: 'Inter', sans-serif; letter-spacing: 0.06em; z-index: 100; }
+  #key-hint { position: fixed; bottom: 16px; left: 24px; font-size: 11px; color: var(--muted); display: flex; gap: 8px; align-items: center; z-index: 100; transition: opacity 0.4s; }
+  #key-hint kbd { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 4px; padding: 2px 7px; font-family: 'Inter', sans-serif; font-size: 11px; }
+
+  @media (max-width: 768px) {
+    .slide { padding: 24px 20px; }
+    .two-col, .cards, .layout-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ── Slide 1: Title ── -->
+  <section class="slide slide-1 active" id="slide-1">
+    <div class="content">
+      <div class="figma-badge step" data-step="1">
+        <span class="dot"></span> Claude × Figma 연동 실습
+      </div>
+      <div class="label step" data-step="2">4강</div>
+      <h1 class="title step" data-step="3">🎨 Figma 카드뉴스 제작</h1>
+      <h2 class="title step" data-step="3" style="color:var(--teal2);font-size:clamp(18px,2.6vw,36px);">AI 소식 5장 — 청록색 / 모던 미니멀</h2>
+      <div class="divider step" data-step="4"></div>
+      <p class="body step" data-step="4">Claude + Figma 연동으로 <strong style="color:var(--teal3)">청록색(#0D9488) 바탕에 흰색 글자</strong>,<br>모던/미니멀 스타일의 카드뉴스 5장을 자동으로 제작합니다.</p>
+    </div>
+  </section>
+
+  <!-- ── Slide 2: 디자인 스펙 ── -->
+  <section class="slide slide-2" id="slide-2">
+    <div class="content">
+      <div class="label step" data-step="1">디자인 스펙</div>
+      <h2 class="subtitle step" data-step="2">🖌 카드뉴스 디자인 스펙</h2>
+      <div class="table-wrap step" data-step="3">
+        <table>
+          <thead><tr><th>항목</th><th>값</th></tr></thead>
+          <tbody>
+            <tr><td><strong>배경색</strong></td><td><span style="display:inline-flex;align-items:center;gap:8px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#0D9488;flex-shrink:0"></span>#0D9488 (Teal 600)</span></td></tr>
+            <tr><td><strong>글자색</strong></td><td><span style="display:inline-flex;align-items:center;gap:8px;"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#fff;border:1px solid rgba(255,255,255,0.2);flex-shrink:0"></span>#FFFFFF (흰색)</span></td></tr>
+            <tr><td><strong>카드 수</strong></td><td>5장</td></tr>
+            <tr><td><strong>카드 크기</strong></td><td>1080 × 1080px (인스타그램 정사각형)</td></tr>
+            <tr><td><strong>스타일</strong></td><td>모던 / 미니멀</td></tr>
+            <tr><td><strong>폰트</strong></td><td>Pretendard 또는 Noto Sans KR</td></tr>
+            <tr><td><strong>레이아웃</strong></td><td>중앙 정렬, 여백 넉넉하게</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Slide 3: 카드 구성 ── -->
+  <section class="slide slide-3" id="slide-3">
+    <div class="content">
+      <div class="label step" data-step="1">카드뉴스 구성</div>
+      <h2 class="subtitle step" data-step="2">📰 카드뉴스 5장 구성</h2>
+      <div class="table-wrap step" data-step="3">
+        <table>
+          <thead><tr><th>카드</th><th>제목</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip">1장</span></td><td><strong>표지</strong></td><td>"AI 주간 소식" 타이틀 + 날짜</td></tr>
+            <tr><td><span class="chip">2장</span></td><td><strong>GPT-5 출시 소식</strong></td><td>주요 기능 3가지 요약</td></tr>
+            <tr><td><span class="chip">3장</span></td><td><strong>Claude 최신 업데이트</strong></td><td>새로운 기능 및 성능 개선</td></tr>
+            <tr><td><span class="chip">4장</span></td><td><strong>AI 도구 TOP 3</strong></td><td>이번 주 주목할 AI 서비스</td></tr>
+            <tr><td><span class="chip">5장</span></td><td><strong>마무리</strong></td><td>다음 호 예고 + 구독 안내</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Slide 4: 실습 1 — 파일 생성 ── -->
+  <section class="slide slide-4" id="slide-4">
+    <div class="content">
+      <div class="label figma-color step" data-step="1">실습 1 — Figma 파일 생성</div>
+      <h2 class="subtitle step" data-step="2">🧪 Figma 파일 생성 프롬프트</h2>
+      <div class="code-block step" data-step="3">
+        <span class="code-label">프롬프트</span><span class="key">Figma에 "AI 주간 소식 카드뉴스" 파일을 만들어줘.</span>
+
+<span class="comment">디자인 스펙:</span>
+<span class="val">- 프레임 크기: 1080 × 1080px</span>
+<span class="val">- 배경색: #0D9488 (청록색)</span>
+<span class="val">- 텍스트: 흰색 (#FFFFFF)</span>
+<span class="val">- 스타일: 모던, 미니멀 / 폰트: Pretendard</span>
+
+<span class="comment">카드 5장 구성:</span>
+<span class="val">1장 - 표지: 제목 "AI 주간 소식", 부제 "2025년 최신 AI 트렌드"</span>
+<span class="val">2장 - GPT-5 출시: 주요 기능 3가지 불릿으로</span>
+<span class="val">3장 - Claude 업데이트: 새 기능 하이라이트</span>
+<span class="val">4장 - AI 도구 TOP 3: 순위 + 한 줄 설명</span>
+<span class="val">5장 - 마무리: 구독 유도 문구 + 다음 호 예고</span>
+
+<span class="val">각 카드 상단에 "AI WEEKLY" 작은 로고 텍스트 포함해줘.</span></div>
+    </div>
+  </section>
+
+  <!-- ── Slide 5: 실습 2 — 카드 수정 ── -->
+  <section class="slide slide-5" id="slide-5">
+    <div class="content">
+      <div class="label figma-color step" data-step="1">실습 2 — 개별 카드 수정</div>
+      <h2 class="subtitle step" data-step="2">🧪 특정 카드 내용 업데이트</h2>
+      <div class="code-block step" data-step="3">
+        <span class="code-label">프롬프트</span><span class="key">Figma "AI 주간 소식 카드뉴스"의 2번 카드 내용을 아래로 바꿔줘.</span>
+
+<span class="val">제목: GPT-5 정식 출시</span>
+<span class="val">내용:</span>
+<span class="val">• 실시간 웹 검색 + 영상 분석 지원</span>
+<span class="val">• 코딩 능력 GPT-4 대비 2배 향상</span>
+<span class="val">• 음성 모드 한국어 지원 추가</span></div>
+      <div class="callout step" data-step="4">✏️ 카드 번호와 수정할 내용만 지정하면 Claude가 해당 프레임만 업데이트합니다.</div>
+    </div>
+  </section>
+
+  <!-- ── Slide 6: 실습 3 — 디자인 일괄 수정 ── -->
+  <section class="slide slide-6" id="slide-6">
+    <div class="content">
+      <div class="label figma-color step" data-step="1">실습 3 — 일괄 수정</div>
+      <h2 class="subtitle step" data-step="2">🧪 디자인 일괄 변경</h2>
+      <div class="divider step" data-step="2"></div>
+      <div class="code-block step" data-step="3">
+        <span class="code-label">프롬프트</span><span class="key">Figma 카드뉴스 5장의 배경색을 #0D9488에서 #0F766E로 변경해줘.</span>
+<span class="val">모든 카드에 동일하게 적용해줘.</span></div>
+      <div class="callout step" data-step="4">⚡ 5장 전체를 한 번에 수정 — 개별로 하나씩 클릭할 필요가 없습니다.</div>
+    </div>
+  </section>
+
+  <!-- ── Slide 7: 레이아웃 가이드 ── -->
+  <section class="slide slide-7" id="slide-7">
+    <div class="content content-wide">
+      <div class="label step" data-step="1">레이아웃 가이드</div>
+      <h2 class="subtitle step" data-step="2">🎨 카드별 레이아웃 구조</h2>
+      <div class="layout-grid step" data-step="3">
+        <div class="layout-card">
+          <span class="lc-num">1/5</span>
+          <div class="lc-header">AI WEEKLY</div>
+          <div class="lc-title">AI 주간 소식</div>
+          <div class="lc-body">2025 AI 트렌드<br>Vol.01 · 2025.04</div>
+        </div>
+        <div class="layout-card">
+          <span class="lc-num">2/5</span>
+          <div class="lc-header">AI WEEKLY &nbsp;·&nbsp; 2/5</div>
+          <div class="lc-title">GPT-5 출시</div>
+          <div class="lc-body">• 실시간 웹 검색<br>• 코딩 능력 2배<br>• 음성 한국어 지원</div>
+        </div>
+        <div class="layout-card">
+          <span class="lc-num">3/5</span>
+          <div class="lc-header">AI WEEKLY &nbsp;·&nbsp; 3/5</div>
+          <div class="lc-title">Claude 업데이트</div>
+          <div class="lc-body">새 기능 하이라이트<br>성능 개선 사항</div>
+        </div>
+        <div class="layout-card">
+          <span class="lc-num">4/5</span>
+          <div class="lc-header">AI WEEKLY &nbsp;·&nbsp; 4/5</div>
+          <div class="lc-title">AI 도구 TOP 3</div>
+          <div class="lc-body">① 서비스명<br>② 서비스명<br>③ 서비스명</div>
+        </div>
+        <div class="layout-card">
+          <span class="lc-num">5/5</span>
+          <div class="lc-header">AI WEEKLY</div>
+          <div class="lc-title">다음 주도 함께해요!</div>
+          <div class="lc-body">팔로우 &amp; 구독하기<br>@aiweekly.korea</div>
+        </div>
+        <div class="layout-card" style="background:rgba(13,148,136,0.04);border-style:dashed;display:flex;align-items:center;justify-content:center;">
+          <div style="text-align:center;">
+            <div style="font-size:22px;margin-bottom:6px;">＋</div>
+            <div class="lc-header" style="text-align:center;">카드 추가 가능</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Slide 8: 활용 팁 ── -->
+  <section class="slide slide-8" id="slide-8">
+    <div class="content">
+      <div class="label step" data-step="1">Figma 커넥터 활용</div>
+      <h2 class="subtitle step" data-step="2">💡 Figma 커넥터 추가 활용 팁</h2>
+      <div class="table-wrap step" data-step="3">
+        <table>
+          <thead><tr><th>작업</th><th>프롬프트 예시</th></tr></thead>
+          <tbody>
+            <tr><td>컬러 팔레트 추출</td><td>"이 Figma 파일의 주요 색상을 추출해줘"</td></tr>
+            <tr><td>컴포넌트 목록 조회</td><td>"현재 파일의 컴포넌트 리스트를 보여줘"</td></tr>
+            <tr><td>레이아웃 분석</td><td>"이 프레임의 그리드/여백 구조를 설명해줘"</td></tr>
+            <tr><td>텍스트 일괄 추출</td><td>"모든 프레임의 텍스트 내용을 추출해줘"</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout step" data-step="4">🔍 Figma 파일 URL만 있으면 Claude가 디자인을 읽고 분석·수정까지 처리합니다.</div>
+    </div>
+  </section>
+
+  <!-- ── Slide 9: 체크리스트 ── -->
+  <section class="slide slide-9" id="slide-9">
+    <div class="content">
+      <div class="label step" data-step="1">실습 완료 확인</div>
+      <h2 class="subtitle step" data-step="2">✅ 체크리스트</h2>
+      <div class="divider step" data-step="2"></div>
+      <ul class="checklist">
+        <li class="step" data-step="3"><div class="check-box"></div><span>Figma 커넥터가 연결되어 있다</span></li>
+        <li class="step" data-step="4"><div class="check-box"></div><span>카드뉴스 5장 프레임을 생성했다</span></li>
+        <li class="step" data-step="5"><div class="check-box"></div><span>각 카드에 내용을 채웠다</span></li>
+        <li class="step" data-step="6"><div class="check-box"></div><span>특정 카드의 내용을 수정해봤다</span></li>
+        <li class="step" data-step="7"><div class="check-box"></div><span>디자인 요소(색상/텍스트)를 일괄 변경해봤다</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── UI ── -->
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+  <div id="counter">1 / 9</div>
+  <div id="key-hint"><kbd>←</kbd><kbd>→</kbd> 이동&nbsp;&nbsp;<kbd>F</kbd> 전체화면</div>
+</div>
+
+<script>
+(function () {
+  const SLIDES = document.querySelectorAll('.slide');
+  const TOTAL = SLIDES.length;
+  const DURATION = 420, STAGGER = 110;
+  const fill = document.getElementById('progress-fill');
+  const counter = document.getElementById('counter');
+  const hint = document.getElementById('key-hint');
+  let cur = 0, busy = false, timers = [];
+
+  function resetSteps(slide) {
+    slide.querySelectorAll('.step').forEach(el => el.classList.remove('visible'));
+  }
+  function showStaggered(slide) {
+    timers.forEach(clearTimeout); timers = [];
+    const groups = {};
+    slide.querySelectorAll('.step').forEach(el => {
+      const k = el.dataset.step || 0;
+      (groups[k] = groups[k] || []).push(el);
+    });
+    Object.keys(groups).sort((a, b) => +a - +b).forEach((k, i) => {
+      timers.push(setTimeout(() => groups[k].forEach(el => el.classList.add('visible')), i * STAGGER));
+    });
+  }
+  function updateUI() {
+    fill.style.width = (TOTAL <= 1 ? 100 : (cur / (TOTAL - 1)) * 100) + '%';
+    counter.textContent = (cur + 1) + ' / ' + TOTAL;
+  }
+  function goTo(idx, instant) {
+    if (busy && !instant) return;
+    if (idx < 0 || idx >= TOTAL) return;
+    busy = true;
+    const prev = SLIDES[cur], next = SLIDES[idx];
+    if (prev === next) { busy = false; return; }
+    timers.forEach(clearTimeout); timers = [];
+    prev.classList.add('exit'); prev.classList.remove('active'); resetSteps(prev);
+    next.classList.add('active'); next.classList.remove('exit');
+    cur = idx; updateUI();
+    const done = () => { prev.classList.remove('exit'); busy = false; showStaggered(next); };
+    const t = setTimeout(done, DURATION + 50);
+    next.addEventListener('transitionend', function h() {
+      clearTimeout(t); next.removeEventListener('transitionend', h); done();
+    }, { once: true });
+    const hash = '#slide-' + (idx + 1);
+    if (location.hash !== hash) history.replaceState(null, '', hash);
+  }
+
+  updateUI(); showStaggered(SLIDES[0]);
+  const initIdx = parseInt((location.hash || '').replace('#slide-', '')) - 1;
+  if (!isNaN(initIdx) && initIdx > 0) goTo(initIdx, true);
+
+  document.addEventListener('keydown', e => {
+    hint.style.opacity = '0';
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); goTo(cur + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goTo(cur - 1); }
+    else if (e.key === 'Home') goTo(0);
+    else if (e.key === 'End') goTo(TOTAL - 1);
+    else if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+      else document.exitFullscreen?.();
+    }
+  });
+  let tx = 0;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    const dx = tx - e.changedTouches[0].clientX;
+    if (Math.abs(dx) > 48) goTo(cur + (dx > 0 ? 1 : -1));
+  });
+  window.addEventListener('hashchange', () => {
+    const idx = parseInt(location.hash.replace('#slide-', '')) - 1;
+    if (!isNaN(idx) && idx !== cur) goTo(idx, true);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code PPT Skill 만들기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0E0C08;
+    color: #F0E8D8;
+    font-family: 'Noto Sans KR', 'Inter', sans-serif;
+    overflow: hidden;
+    height: 100dvh;
+    width: 100vw;
+  }
+
+  #app {
+    position: relative;
+    width: 100%;
+    height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translate3d(60px, 0, 0);
+    transition: opacity 400ms ease, transform 400ms ease;
+    pointer-events: none;
+    padding: 48px 64px;
+  }
+  .slide.active {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    pointer-events: auto;
+  }
+  .slide.exit {
+    opacity: 0;
+    transform: translate3d(-60px, 0, 0);
+  }
+
+  .content {
+    width: 100%;
+    max-width: 960px;
+    text-align: left;
+  }
+  .content.center { text-align: center; }
+
+  .label {
+    font-size: clamp(11px, 1.2vw, 14px);
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #9B8A6A;
+    margin-bottom: 20px;
+  }
+  .title {
+    font-size: clamp(32px, 5.5vw, 68px);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #F0E8D8;
+    margin-bottom: 16px;
+  }
+  .subtitle {
+    font-size: clamp(20px, 3vw, 36px);
+    font-weight: 700;
+    line-height: 1.3;
+    color: #E8D8B8;
+    margin-bottom: 24px;
+  }
+  .body {
+    font-size: clamp(14px, 1.6vw, 20px);
+    font-weight: 300;
+    line-height: 1.8;
+    color: #C8B898;
+  }
+  .big {
+    font-size: clamp(22px, 3.5vw, 48px);
+    font-weight: 700;
+    line-height: 1.25;
+    color: #F0E8D8;
+  }
+  .accent { color: #F5A623; }
+  .accent2 { color: #7ED8A4; }
+  .accent3 { color: #74B9E8; }
+
+  .divider {
+    width: 64px;
+    height: 3px;
+    background: linear-gradient(90deg, #F5A623, #E8834A);
+    border-radius: 2px;
+    margin: 24px 0;
+  }
+
+  .step { opacity: 0; transform: translate3d(0, 20px, 0); transition: opacity 350ms ease, transform 350ms ease; }
+  .step.visible { opacity: 1; transform: translate3d(0, 0, 0); }
+
+  ul.bullet { list-style: none; padding: 0; }
+  ul.bullet li {
+    font-size: clamp(14px, 1.7vw, 22px);
+    font-weight: 400;
+    line-height: 1.7;
+    color: #D8C8A8;
+    padding: 8px 0 8px 28px;
+    position: relative;
+    border-bottom: 1px solid rgba(240,232,216,0.06);
+  }
+  ul.bullet li:last-child { border-bottom: none; }
+  ul.bullet li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: #F5A623;
+    font-size: 0.85em;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 8px;
+  }
+  .card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 24px 20px;
+    transition: background 300ms;
+  }
+  .card:hover { background: rgba(255,255,255,0.07); }
+  .card .card-num {
+    font-size: clamp(28px, 3vw, 40px);
+    font-weight: 900;
+    color: #F5A623;
+    margin-bottom: 8px;
+    line-height: 1;
+  }
+  .card .card-title {
+    font-size: clamp(13px, 1.4vw, 17px);
+    font-weight: 700;
+    color: #F0E8D8;
+    margin-bottom: 6px;
+  }
+  .card .card-body {
+    font-size: clamp(11px, 1.1vw, 14px);
+    color: #9B8A6A;
+    line-height: 1.6;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+    margin-top: 8px;
+  }
+  .col-box {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 28px 24px;
+  }
+  .col-box .col-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #7ED8A4;
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+
+  .code-block {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-top: 16px;
+    font-family: 'Courier New', monospace;
+    font-size: clamp(12px, 1.3vw, 16px);
+    line-height: 1.8;
+    color: #7ED8A4;
+  }
+  .code-block .c-comment { color: #6B7280; }
+  .code-block .c-key { color: #74B9E8; }
+  .code-block .c-val { color: #F5A623; }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .tag {
+    background: rgba(245,166,35,0.12);
+    border: 1px solid rgba(245,166,35,0.3);
+    color: #F5A623;
+    border-radius: 100px;
+    padding: 8px 18px;
+    font-size: clamp(12px, 1.2vw, 15px);
+    font-weight: 500;
+  }
+  .tag.green {
+    background: rgba(126,216,164,0.1);
+    border-color: rgba(126,216,164,0.3);
+    color: #7ED8A4;
+  }
+  .tag.blue {
+    background: rgba(116,185,232,0.1);
+    border-color: rgba(116,185,232,0.3);
+    color: #74B9E8;
+  }
+
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .flow-item {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: clamp(12px, 1.3vw, 16px);
+    font-weight: 600;
+    color: #F0E8D8;
+  }
+  .flow-arrow { color: #F5A623; font-size: 20px; }
+
+  .big-quote {
+    font-size: clamp(18px, 2.5vw, 32px);
+    font-weight: 400;
+    color: #D8C8A8;
+    line-height: 1.7;
+    border-left: 3px solid #F5A623;
+    padding-left: 24px;
+    margin: 24px 0;
+  }
+
+  /* slide backgrounds */
+  .slide-1  { background: radial-gradient(ellipse at 20% 50%, rgba(245,166,35,0.12) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(116,185,232,0.08) 0%, transparent 50%); }
+  .slide-2  { background: radial-gradient(ellipse at 70% 60%, rgba(116,185,232,0.1) 0%, transparent 55%); }
+  .slide-3  { background: radial-gradient(ellipse at 30% 40%, rgba(126,216,164,0.1) 0%, transparent 55%); }
+  .slide-4  { background: radial-gradient(ellipse at 60% 30%, rgba(245,166,35,0.08) 0%, transparent 60%); }
+  .slide-5  { background: radial-gradient(ellipse at 20% 70%, rgba(126,216,164,0.08) 0%, transparent 55%); }
+  .slide-6  { background: radial-gradient(ellipse at 75% 50%, rgba(245,166,35,0.1) 0%, transparent 60%); }
+  .slide-7  { background: radial-gradient(ellipse at 40% 30%, rgba(116,185,232,0.1) 0%, transparent 55%); }
+  .slide-8  { background: radial-gradient(ellipse at 60% 70%, rgba(126,216,164,0.09) 0%, transparent 55%); }
+  .slide-9  { background: radial-gradient(ellipse at 25% 45%, rgba(245,166,35,0.1) 0%, transparent 60%); }
+  .slide-10 { background: radial-gradient(ellipse at 70% 35%, rgba(116,185,232,0.09) 0%, transparent 55%); }
+  .slide-11 { background: radial-gradient(ellipse at 50% 60%, rgba(245,166,35,0.08) 0%, transparent 55%); }
+  .slide-12 { background: radial-gradient(ellipse at 30% 30%, rgba(126,216,164,0.1) 0%, transparent 55%); }
+  .slide-13 { background: radial-gradient(ellipse at 65% 55%, rgba(116,185,232,0.1) 0%, transparent 55%); }
+  .slide-14 { background: radial-gradient(ellipse at 50% 50%, rgba(245,166,35,0.15) 0%, transparent 65%); }
+
+  /* UI chrome */
+  #progress-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    z-index: 100;
+  }
+  #progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #F5A623, #E8834A);
+    transition: width 400ms ease;
+    border-radius: 0 2px 2px 0;
+  }
+  #counter {
+    position: fixed;
+    bottom: 18px; right: 24px;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(240,232,216,0.35);
+    letter-spacing: 0.05em;
+    z-index: 100;
+    font-family: 'Inter', sans-serif;
+  }
+  #key-hint {
+    position: fixed;
+    bottom: 18px; left: 24px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    z-index: 100;
+    transition: opacity 600ms ease;
+  }
+  #key-hint kbd {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 5px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-family: 'Inter', sans-serif;
+    color: rgba(240,232,216,0.4);
+  }
+  #key-hint span { font-size: 11px; color: rgba(240,232,216,0.25); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide, .step, #progress-fill { transition: none !important; }
+  }
+  @media (max-width: 600px) {
+    .slide { padding: 32px 24px; }
+    .card-grid { grid-template-columns: 1fr 1fr; }
+    .two-col { grid-template-columns: 1fr; gap: 16px; }
+    .flow-row { gap: 8px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Slide 1: 오프닝 -->
+  <section class="slide slide-1 active" id="slide-1">
+    <div class="content center">
+      <div class="label step" data-step="1">Claude Code Workshop · 2026</div>
+      <h1 class="title step" data-step="2">Claude Code<br><span class="accent">PPT Skill</span> 만들기</h1>
+      <div class="divider step" data-step="3" style="margin:24px auto;"></div>
+      <p class="body step" data-step="4">스킬 설계부터 제작, 테스트, 마켓플레이스 배포까지<br>한 번에 정리합니다.</p>
+    </div>
+  </section>
+
+  <!-- Slide 2: Claude Code란? -->
+  <section class="slide slide-2" id="slide-2">
+    <div class="content">
+      <div class="label step" data-step="1">Slide 02 · 개념</div>
+      <h2 class="subtitle step" data-step="2">Claude Code란?</h2>
+      <div class="divider step" data-step="3"></div>
+      <p class="big-quote step" data-step="4">AI가 코드를 이해하고 실행하면서<br>자동으로 결과를 만들어주는 개발 환경</p>
+      <div class="tag-row">
+        <span class="tag step" data-step="5">Skill 중심 구조</span>
+        <span class="tag green step" data-step="6">자동화 실행</span>
+        <span class="tag blue step" data-step="7">AI 기반 코드 이해</span>
+      </div>
+      <p class="body step" data-step="8" style="margin-top:24px;">여기서 핵심은 <span class="accent">'Skill'</span>입니다.<br>Skill은 특정 작업을 자동으로 수행하는 작은 AI 프로그램입니다.</p>
+    </div>
+  </section>
+
+  <!-- Slide 3: 오늘 만들 것 -->
+  <section class="slide slide-3" id="slide-3">
+    <div class="content">
+      <div class="label step" data-step="1">Slide 03 · 목표</div>
+      <h2 class="subtitle step" data-step="2">오늘 만들 것</h2>
+      <div class="divider step" data-step="3"></div>
+      <p class="big step" data-step="4">텍스트만 입력하면<br><span class="accent2">자동으로 PPT를 만드는</span> Skill</p>
+      <div class="code-block step" data-step="5">
+        <span class="c-comment"># 사용자 입력</span><br>
+        <span class="c-key">&gt;</span> <span class="c-val">"SaaS 설명 PPT 만들어줘"</span><br><br>
+        <span class="c-comment"># 자동 생성 결과</span><br>
+        <span class="c-key">✓</span> 슬라이드 구조 자동 생성<br>
+        <span class="c-key">✓</span> HTML / CSS / JS 완성본 출력
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 4: Skill 구조 이해 -->
+  <section class="slide slide-4" id="slide-4">
+    <div class="content">
+      <div class="label step" data-step="1">Slide 04 · 구조</div>
+      <h2 class="subtitle step" data-step="2">Skill 구조 이해</h2>
+      <div class="divider step" data-step="3"></div>
+      <div class="card-grid">
+        <div class="card step" data-step="4">
+          <div class="card-num">01</div>
+          <div class="card-title">역할 정의</div>
+          <div class="card-body">무엇을 하는 Skill인지 명확하게 정의</div>
+        </div>
+        <div class="card step" data-step="5">
+          <div class="card-num accent2" style="color:#7ED8A4;">02</div>
+          <div class="card-title">입력 구조</div>
+          <div class="card-body">사용자가 무엇을 입력하는지 규정</div>
+        </div>
+        <div class="card step" data-step="6">
+          <div class="card-num" style="color:#74B9E8;">03</div>
+          <div class="card-title">출력 형태</div>
+          <div class="card-body">어떤 결과를 어떤 형식으로 만드는지</div>
+        </div>
+      </div>
+      <p class="body step" data-step="7" style="margin-top:28px;">이 구조만 이해하면 <span class="accent">어떤 Skill이든 만들 수 있습니다.</span></p>
+    </div>
+  </section>
+
+  <!-- Slide 5: PPT Skill 설계 -->
+  <section class="slide slide-5" id="slide-5">
+    <div class="content">
+      <div class="label step" data-step="1">Slide 05 · 설계</div>
+      <h2 class="subtitle step" data-step="2">PPT Skill 설계</h2>
+      <div class="divider step" data-step="3"></div>
+      <div class="two-col">
+        <div class="col-box step" data-step="4">
+          <div class="col-label">Input</div>
+          <ul class="bullet">
+            <li>주제 (텍스트)</li>
+            <li>슬라이드 수 (선택)</li>
+            <li>톤 / 스타일 (선택)</li>
+          </ul>
+        </div>
+        <div class="col-box step" data-step="5">
+          <div class="col-label" style="color:#F5A623;">Output</div>
+          <ul class="bullet">
+            <li>슬라이드 리스트</li>
+            <li>각 슬라이드: 제목 + 내용</li>
+            <li>HTML 완성 파일</li>
+          </ul>
+        </div>
+      </div>
+      <p class="body step" data-step="6" style="margin-top:24px;">핵심 포인트: AI가 <span class="accent">슬라이드 구조를 먼저 생각</span>하게 만드는 것</p>
+    </div>
+  </section>
+
+  <!-- Slide 6: Skill Creator 작성 -->
+  <section class="slide slide-6" id="slide-6">
+    <div class="content">
+      <div class="label step" data-step="1">Slide 06 · 제작</div>
+      <h2 class="subtitle step" data-step="2">Skill Creator 작성</h2>
+      <div class="divider step" data-step="3"></div>
+      <p class="body step" data-step="4">핵심은 <span class="accent">프롬프트 설계</span>입니다. AI에게 역할을 명확하게 줘야 합니다.</p>
+      <div class="code-block step" data-step="5">
+        <span class="c-comment"># SKILL.md 핵심 구조</span><br>
+        <span class="c-key">역할:</span> <span class="c-val">너는 PPT 전문가다</span><br>
+        <span class="c-key">입력:</span> <span class="c-val">사용자가 주제를 제공</span><br>
+        <span class="c-key">동작:</span> <span class="c-val">슬라이드 구조를 먼저 설계</span><br>
+        <span class="c-key">출력:</span> <span class="c-val">완성된 HTML 파일 생성</span>
+      </div>
+      <p class="body step" data-step="6" style="margin-top:20px;">역할을 <span class="accent2">명확하게</span> 줄수록 결과 품질이 높아집니다.</p>
+    </div>
+  </section>
+
+  <!-- Slide 7: 출력 포맷 정의 -->
+  <section class="slide slide-7" id="slide-7">
+    <div class="content">
+      <div class="label step" data-step="1">Slide 07 · 포맷</div>
+      <h2 class="subtitle step" data-step="2">출력 포맷 정의</h2>
+      <div class="divider step" data-step="3"></div>
+      <p class="body step" data-step="4">출력은 반드시 <span class="accent">구조화</span>해야 합니다.</p>
+      <div class="code-block step" data-step="5">
+        <span class="c-key">Slide 1:</span> <span class="c-val">제목 슬라이드</span><br>
+        <span class="c-key">Slide 2:</span> <span class="c-val">개요 / 목차</span><br>
+        <span class="c-key">Slide 3:</span> <span class="c-val">핵심 내용 #1</span><br>
+        <span class="c-key">Slide 4:</span> <span class="c-val">핵심 내용 #2</span><br>
+        <span class="c-comment">... (구조화된 슬라이드 리스트)</span>
+      </div>
+      <p class="body step" data-step="6" style="margin-top:20px;">구조화된 출력은 <span class="accent2">HTML / PPT 변환</span>을 쉽게 만들어 줍니다.</p>
+    </div>
+  </section>
+
+  <!-- Slide 8: 실행 테스트 -->
+  <section class="slide slide-8" id="slide-8">
+    <div class="content">
+      <div class="label step" data-step="1">Slide 08 · 테스트</div>
+      <h2 class="subtitle step" data-step="2">실행 테스트</h2>
+      <div class="divider step" data-step="3"></div>
+      <div class="two-col">
+        <div class="col-box step" data-step="4">
+          <div class="col-label">예시 입력</div>
+          <p class="body" style="color:#F0E8D8; font-size:clamp(13px,1.5vw,18px);">"스타트업 투자<br>PPT 만들어줘"</p>
+        </div>
+        <div class="col-box step" data-step="5">
+          <div class="col-label" style="color:#F5A623;">결과</div>
+          <ul class="bullet" style="font-size:clamp(12px,1.3vw,16px);">
+            <li>10장 이상 슬라이드 자동 생성</li>
+            <li>각 슬라이드 내용 완성</li>
+            <li>HTML 파일 즉시 사용 가능</li>
+          </ul>
+        </div>
+      </div>
+      <p class="body step" data-step="6" style="margin-top:24px;">중요: 결과를 <span class="accent">계속 수정</span>하면서 품질을 높이는 반복 과정이 핵심입니다.</p>
+    </div>
+  </section>
+
+  <!-- Slide 9: HTML PPT 변환 -->
+  <section class="slide slide-9" id="slide-9">
+    <div class="content">
+      <div class="label step" data-step="1">Slide 09 · 변환</div>
+      <h2 class="subtitle step" data-step="2">HTML PPT 변환</h2>
+      <div class="divider step" data-step="3"></div>
+      <p class="big step" data-step="4">단일 HTML 파일 →<br><span class="accent2">웹 기반 프레젠테이션</span></p>
+      <div class="tag-row step" data-step="5">
+        <span class="tag">HTML</span>
+        <span class="tag green">CSS</span>
+        <span class="tag blue">JavaScript</span>
+      </div>
+      <ul class="bullet step" data-step="6" style="margin-top:24px;">
+        <li>서버 없이 브라우저에서 즉시 실행</li>
+        <li>키보드 / 터치 네비게이션 포함</li>
+        <li>외부 라이브러리 의존 없음</li>
+        <li>F키로 풀스크린 전환</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Slide 10: Marketplace 배포 -->
+  <section class="slide slide-10" id="slide-10">
+    <div class="content">
+      <div class="label step" data-step="1">Slide 10 · 배포</div>
+      <h2 class="subtitle step" data-step="2">Marketplace 배포</h2>
+      <div class="divider step" data-step="3"></div>
+      <div class="flow-row step" data-step="4">
+        <span class="flow-item">Skill 등록</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-item">설명 작성</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-item">사용법 정의</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-item">공개 설정</span>
+      </div>
+      <p class="body step" data-step="5" style="margin-top:28px;">배포 후에는 <span class="accent">다른 사람도 바로 사용</span>할 수 있게 됩니다.</p>
+      <div class="code-block step" data-step="6" style="margin-top:16px;">
+        <span class="c-comment"># .claude-plugin/plugin.json</span><br>
+        <span class="c-key">name:</span> <span class="c-val">ppt-maker</span><br>
+        <span class="c-key">version:</span> <span class="c-val">1.0.0</span><br>
+        <span class="c-key">description:</span> <span class="c-val">PPT 자동 생성 스킬</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 11: 배포 핵심 포인트 -->
+  <section class="slide slide-11" id="slide-11">
+    <div class="content">
+      <div class="label step" data-step="1">Slide 11 · 핵심</div>
+      <h2 class="subtitle step" data-step="2">배포 시 핵심 포인트</h2>
+      <div class="divider step" data-step="3"></div>
+      <div class="card-grid">
+        <div class="card step" data-step="4">
+          <div class="card-num">01</div>
+          <div class="card-title">명확한 설명</div>
+          <div class="card-body">Skill이 무엇을 하는지 한 줄로 전달</div>
+        </div>
+        <div class="card step" data-step="5">
+          <div class="card-num" style="color:#7ED8A4;">02</div>
+          <div class="card-title">좋은 예시 입력</div>
+          <div class="card-body">사용자가 따라할 수 있는 예시 제공</div>
+        </div>
+        <div class="card step" data-step="6">
+          <div class="card-num" style="color:#74B9E8;">03</div>
+          <div class="card-title">결과 품질</div>
+          <div class="card-body">품질이 높아야 재사용률이 올라간다</div>
+        </div>
+      </div>
+      <p class="body step" data-step="7" style="margin-top:28px;">이 3가지가 좋으면 <span class="accent">사용자가 많아집니다.</span></p>
+    </div>
+  </section>
+
+  <!-- Slide 12: 활용 방법 -->
+  <section class="slide slide-12" id="slide-12">
+    <div class="content">
+      <div class="label step" data-step="1">Slide 12 · 활용</div>
+      <h2 class="subtitle step" data-step="2">활용 방법</h2>
+      <div class="divider step" data-step="3"></div>
+      <p class="big step" data-step="4"><span class="accent2">반복 작업</span>을 자동화하는 도구</p>
+      <ul class="bullet step" data-step="5" style="margin-top:24px;">
+        <li>강의 자료 제작 — 강사 / 교육 콘텐츠 팀</li>
+        <li>회사 발표 자료 — 기획·영업 프레젠테이션</li>
+        <li>마케팅 기획 PPT — 브랜드·캠페인 제안서</li>
+        <li>투자 피칭 자료 — 스타트업 IR 덱</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Slide 13: 확장 아이디어 -->
+  <section class="slide slide-13" id="slide-13">
+    <div class="content">
+      <div class="label step" data-step="1">Slide 13 · 확장</div>
+      <h2 class="subtitle step" data-step="2">확장 아이디어</h2>
+      <div class="divider step" data-step="3"></div>
+      <p class="body step" data-step="4">현재 버전에서 더 발전시키면:</p>
+      <div class="card-grid" style="margin-top:20px;">
+        <div class="card step" data-step="5">
+          <div class="card-num">🎨</div>
+          <div class="card-title">디자인 자동 적용</div>
+          <div class="card-body">브랜드 색상·폰트 자동 반영</div>
+        </div>
+        <div class="card step" data-step="6">
+          <div class="card-num">🖼️</div>
+          <div class="card-title">이미지 자동 삽입</div>
+          <div class="card-body">관련 이미지 검색 후 자동 삽입</div>
+        </div>
+        <div class="card step" data-step="7">
+          <div class="card-num">📊</div>
+          <div class="card-title">차트 생성</div>
+          <div class="card-body">데이터 기반 차트 자동 시각화</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 14: 마무리 -->
+  <section class="slide slide-14" id="slide-14">
+    <div class="content center">
+      <div class="label step" data-step="1">Slide 14 · 결론</div>
+      <h2 class="title step" data-step="2">핵심은<br><span class="accent">구조 설계</span>입니다.</h2>
+      <div class="divider step" data-step="3" style="margin:24px auto;"></div>
+      <p class="body step" data-step="4" style="font-size:clamp(15px,1.8vw,22px); max-width:600px; margin:0 auto;">Claude Code로 PPT Skill을 만들고<br>마켓플레이스에 배포하는 전체 흐름을 살펴봤습니다.</p>
+      <div class="flow-row step" data-step="5" style="justify-content:center; margin-top:32px;">
+        <span class="flow-item">입문</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-item">제작</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-item">테스트</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-item">배포</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-item" style="border-color:rgba(245,166,35,0.4);color:#F5A623;">확장</span>
+      </div>
+    </div>
+  </section>
+
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+  <div id="counter">1 / 14</div>
+  <div id="key-hint">
+    <kbd>←</kbd><kbd>→</kbd><span>navigate</span>
+    <kbd style="margin-left:8px;">F</kbd><span>fullscreen</span>
+  </div>
+</div>
+
+<script>
+(function () {
+  const DURATION = 400;
+  const STAGGER = 130;
+  const TOTAL = 14;
+
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const fill = document.getElementById('progress-fill');
+  const counter = document.getElementById('counter');
+  const hint = document.getElementById('key-hint');
+
+  let cur = 0;
+  let busy = false;
+  let staggerTimers = [];
+  let touchStartX = 0;
+
+  function resetSteps(slide) {
+    slide.querySelectorAll('.step').forEach(el => el.classList.remove('visible'));
+  }
+
+  function showStaggered(slide) {
+    staggerTimers.forEach(clearTimeout);
+    staggerTimers = [];
+    const steps = Array.from(slide.querySelectorAll('.step'))
+      .sort((a, b) => (+a.dataset.step || 0) - (+b.dataset.step || 0));
+    steps.forEach((el, i) => {
+      staggerTimers.push(setTimeout(() => el.classList.add('visible'), i * STAGGER));
+    });
+  }
+
+  function updateUI(idx) {
+    counter.textContent = (idx + 1) + ' / ' + TOTAL;
+    fill.style.width = ((idx + 1) / TOTAL * 100) + '%';
+    const hash = '#slide-' + (idx + 1);
+    if (location.hash !== hash) history.replaceState(null, '', hash);
+  }
+
+  function goTo(idx, instant) {
+    if (idx < 0 || idx >= TOTAL) return;
+    if (busy && !instant) return;
+    if (idx === cur && !instant) return;
+
+    busy = true;
+    const prev = slides[cur];
+    const next = slides[idx];
+
+    prev.classList.add('exit');
+    prev.classList.remove('active');
+
+    resetSteps(next);
+    next.classList.add('active');
+    next.classList.remove('exit');
+
+    cur = idx;
+    updateUI(cur);
+
+    const done = () => {
+      prev.classList.remove('exit');
+      busy = false;
+      showStaggered(next);
+    };
+
+    if (instant) { done(); return; }
+
+    const tid = setTimeout(done, DURATION + 50);
+    next.addEventListener('transitionend', function h() {
+      clearTimeout(tid);
+      next.removeEventListener('transitionend', h);
+      done();
+    }, { once: true });
+  }
+
+  function hideHint() {
+    hint.style.opacity = '0';
+    hint.style.pointerEvents = 'none';
+  }
+
+  document.addEventListener('keydown', e => {
+    hideHint();
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); goTo(cur + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goTo(cur - 1); }
+    else if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+    else if (e.key === 'End') { e.preventDefault(); goTo(TOTAL - 1); }
+    else if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+      else document.exitFullscreen().catch(() => {});
+    }
+  });
+
+  document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    hideHint();
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 48) goTo(dx < 0 ? cur + 1 : cur - 1);
+  });
+
+  window.addEventListener('hashchange', () => {
+    const m = location.hash.match(/#slide-(\d+)/);
+    if (m) goTo(parseInt(m[1], 10) - 1, true);
+  });
+
+  // init
+  const initHash = location.hash.match(/#slide-(\d+)/);
+  const initIdx = initHash ? Math.min(Math.max(parseInt(initHash[1], 10) - 1, 0), TOTAL - 1) : 0;
+  goTo(initIdx, true);
+})();
+</script>
+</body>
+</html>

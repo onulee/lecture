@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[3강] Google Calendar 연동 실습 — 정기 & 특정 일정 등록</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Inter:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #080C10;
+    --text: #E4EEF8;
+    --muted: #7090B0;
+    --accent: #1A73E8;
+    --accent2: #4DA3FF;
+    --accent3: #8EC8FF;
+    --gcal: #34A853;
+    --gcal2: #5BC97A;
+    --red: #EA4335;
+    --yellow: #FBBC04;
+    --border: rgba(26, 115, 232, 0.28);
+    --card-bg: rgba(26, 115, 232, 0.08);
+    --duration: 420ms;
+    --stagger: 110ms;
+  }
+
+  html, body {
+    width: 100%; height: 100dvh;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #app {
+    position: relative;
+    width: 100%; height: 100dvh;
+    overflow: hidden;
+  }
+
+  /* ── Slides ── */
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0;
+    transform: translate3d(60px, 0, 0);
+    transition: opacity var(--duration) ease, transform var(--duration) ease;
+    pointer-events: none;
+    padding: 40px 60px;
+  }
+  .slide.active {
+    opacity: 1; transform: translate3d(0, 0, 0);
+    pointer-events: auto;
+  }
+  .slide.exit {
+    opacity: 0; transform: translate3d(-60px, 0, 0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide { transition: none; }
+  }
+
+  /* ── Step elements ── */
+  .step { opacity: 0; transform: translate3d(0, 20px, 0); transition: opacity 0.35s ease, transform 0.35s ease; }
+  .step.visible { opacity: 1; transform: translate3d(0, 0, 0); }
+
+  /* ── Slide Backgrounds ── */
+  .slide-1 { background: radial-gradient(ellipse 80% 60% at 25% 40%, rgba(26,115,232,0.20) 0%, transparent 70%), radial-gradient(ellipse 55% 70% at 80% 70%, rgba(52,168,83,0.13) 0%, transparent 65%), var(--bg); }
+  .slide-2 { background: radial-gradient(ellipse 70% 55% at 75% 30%, rgba(26,115,232,0.16) 0%, transparent 65%), var(--bg); }
+  .slide-3 { background: radial-gradient(ellipse 65% 60% at 20% 65%, rgba(52,168,83,0.15) 0%, transparent 65%), var(--bg); }
+  .slide-4 { background: radial-gradient(ellipse 65% 55% at 70% 25%, rgba(251,188,4,0.10) 0%, transparent 65%), var(--bg); }
+  .slide-5 { background: radial-gradient(ellipse 70% 60% at 20% 50%, rgba(26,115,232,0.15) 0%, transparent 65%), var(--bg); }
+  .slide-6 { background: radial-gradient(ellipse 65% 55% at 75% 60%, rgba(52,168,83,0.13) 0%, transparent 65%), var(--bg); }
+  .slide-7 { background: radial-gradient(ellipse 75% 60% at 40% 50%, rgba(52,168,83,0.14) 0%, transparent 65%), var(--bg); }
+
+  /* ── Content ── */
+  .content {
+    width: 100%; max-width: 960px;
+    display: flex; flex-direction: column;
+  }
+  .content-wide { max-width: 1100px; }
+
+  /* ── Typography ── */
+  .label {
+    font-size: clamp(10px, 1.1vw, 13px);
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 16px;
+  }
+  .label.green { color: var(--gcal2); }
+
+  .title {
+    font-size: clamp(28px, 4.5vw, 56px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .subtitle {
+    font-size: clamp(18px, 2.5vw, 30px);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text);
+    margin-bottom: 22px;
+  }
+
+  .body {
+    font-size: clamp(13px, 1.4vw, 17px);
+    line-height: 1.8;
+    color: #A8C4E0;
+  }
+
+  .divider {
+    width: 56px; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--gcal));
+    border-radius: 2px;
+    margin: 18px 0 26px;
+  }
+
+  /* ── Badge ── */
+  .gcal-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(26,115,232,0.12);
+    border: 1px solid rgba(26,115,232,0.30);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px; font-weight: 500;
+    color: var(--accent2);
+    margin-bottom: 18px;
+  }
+  .gcal-badge .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent2);
+    animation: blink 2s ease infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
+  }
+
+  /* ── Scenario callout ── */
+  .scenario {
+    background: rgba(26,115,232,0.10);
+    border-left: 3px solid var(--accent2);
+    border-radius: 8px;
+    padding: 14px 20px;
+    font-size: clamp(12px, 1.25vw, 15px);
+    line-height: 1.7;
+    color: #A8C4E0;
+    margin-bottom: 20px;
+  }
+
+  .callout {
+    background: rgba(52,168,83,0.10);
+    border-left: 3px solid var(--gcal2);
+    border-radius: 8px;
+    padding: 14px 20px;
+    font-size: clamp(12px, 1.25vw, 14px);
+    line-height: 1.7;
+    color: #A8C4E0;
+    margin-top: 18px;
+  }
+  .callout strong { color: var(--gcal2); }
+
+  /* ── Code block ── */
+  .code-block {
+    background: #0C1018;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(11px, 1.1vw, 13px);
+    line-height: 1.85;
+    color: #8EC8FF;
+    white-space: pre-wrap;
+    overflow: auto;
+    position: relative;
+  }
+  .code-label {
+    position: absolute; top: 10px; right: 14px;
+    font-size: 10px; letter-spacing: 0.1em;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+  }
+  .code-block .key { color: #4DA3FF; }
+  .code-block .val { color: #5BC97A; }
+  .code-block .comment { color: #4A6080; }
+
+  /* ── Query list ── */
+  .query-group { margin-bottom: 22px; }
+  .query-title {
+    font-size: clamp(12px, 1.2vw, 14px);
+    font-weight: 600;
+    color: var(--accent3);
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .query-item {
+    background: #0C1018;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(11px, 1.1vw, 13px);
+    color: #8EC8FF;
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+
+  /* ── Table ── */
+  .table-wrap {
+    overflow: auto;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: clamp(12px, 1.2vw, 14px); }
+  th {
+    background: rgba(26,115,232,0.18);
+    color: var(--accent3);
+    font-weight: 600;
+    padding: 12px 18px;
+    text-align: left;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 12px 18px;
+    border-bottom: 1px solid rgba(26,115,232,0.10);
+    color: #A8C4E0;
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(26,115,232,0.06); }
+  .chip {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px; font-weight: 500;
+    background: rgba(26,115,232,0.18);
+    color: var(--accent2);
+    border: 1px solid rgba(26,115,232,0.25);
+  }
+
+  /* ── Cards ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+  .card-title {
+    font-size: clamp(13px, 1.25vw, 15px);
+    font-weight: 600;
+    color: var(--accent2);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* ── Checklist ── */
+  .checklist { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+  .checklist li {
+    display: flex; align-items: flex-start; gap: 14px;
+    font-size: clamp(14px, 1.5vw, 18px);
+    line-height: 1.5; color: #A8C4E0;
+  }
+  .check-box {
+    flex-shrink: 0;
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    border: 2px solid var(--accent);
+    margin-top: 2px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── Google colors bar ── */
+  .gbar {
+    display: flex; gap: 6px; margin-bottom: 20px;
+  }
+  .gbar span {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+
+  /* ── Progress & UI ── */
+  #progress-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 3px; background: rgba(255,255,255,0.05); z-index: 100;
+  }
+  #progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--gcal));
+    transition: width var(--duration) ease;
+  }
+  #counter {
+    position: fixed; bottom: 16px; right: 24px;
+    font-size: 12px; font-weight: 500;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.06em; z-index: 100;
+  }
+  #key-hint {
+    position: fixed; bottom: 16px; left: 24px;
+    font-size: 11px; color: var(--muted);
+    display: flex; gap: 8px; align-items: center; z-index: 100;
+    transition: opacity 0.4s;
+  }
+  #key-hint kbd {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-family: 'Inter', sans-serif; font-size: 11px;
+  }
+
+  @media (max-width: 768px) {
+    .slide { padding: 24px 20px; }
+    .two-col { grid-template-columns: 1fr; gap: 16px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ── Slide 1: Title ── -->
+  <section class="slide slide-1 active" id="slide-1">
+    <div class="content">
+      <div class="gcal-badge step" data-step="1">
+        <span class="dot"></span> Claude × Google Calendar 연동 실습
+      </div>
+      <div class="gbar step" data-step="2">
+        <span style="background:#4285F4"></span>
+        <span style="background:#EA4335"></span>
+        <span style="background:#FBBC04"></span>
+        <span style="background:#34A853"></span>
+      </div>
+      <div class="label step" data-step="2">3강</div>
+      <h1 class="title step" data-step="3">📅 Google Calendar</h1>
+      <h2 class="title step" data-step="3" style="color:var(--accent2);font-size:clamp(20px,2.8vw,38px);">정기 &amp; 특정 일정 등록 실습</h2>
+      <div class="divider step" data-step="4"></div>
+      <p class="body step" data-step="4">반복 일정 등록, 특정 미팅 추가, 일정 조회까지<br><strong style="color:var(--accent3)">대화 한 번으로</strong> 처리할 수 있습니다.</p>
+    </div>
+  </section>
+
+  <!-- ── Slide 2: 실습 1 — 매주 전체회의 ── -->
+  <section class="slide slide-2" id="slide-2">
+    <div class="content">
+      <div class="label green step" data-step="1">실습 1 — 반복 일정</div>
+      <h2 class="subtitle step" data-step="2">🔁 매주 월요일 전체회의 등록</h2>
+      <div class="scenario step" data-step="2">
+        📋 매주 월요일 오전 10:00 ~ 11:00, 팀 전체가 참여하는 주간 회의를 반복 일정으로 등록합니다.
+      </div>
+      <div class="code-block step" data-step="3">
+        <span class="code-label">프롬프트</span><span class="key">Google Calendar에 아래 조건으로 반복 일정을 추가해줘.</span>
+
+<span class="val">- 제목: 전체 주간회의</span>
+<span class="val">- 시작일: 다음 주 월요일</span>
+<span class="val">- 시간: 오전 10:00 ~ 11:00</span>
+<span class="val">- 반복: 매주 월요일</span>
+<span class="val">- 장소: 대회의실 (또는 Google Meet 링크 포함)</span>
+<span class="val">- 참석자: [이메일 주소 목록]</span>
+<span class="val">- 설명: 주간 업무 공유 및 이슈 논의 정기 회의</span></div>
+      <div class="callout step" data-step="4">
+        ✏️ <strong>직접 해보기</strong>: [ ] 안의 내용을 내 상황에 맞게 수정해서 실행해보세요.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Slide 3: 실습 2 — 특정 날 미팅 ── -->
+  <section class="slide slide-3" id="slide-3">
+    <div class="content">
+      <div class="label green step" data-step="1">실습 2 — 단발성 미팅</div>
+      <h2 class="subtitle step" data-step="2">📌 특정 날 미팅 추가</h2>
+      <div class="scenario step" data-step="2">
+        🤝 외부 클라이언트와의 미팅을 특정 날짜에 단발성으로 등록합니다.
+      </div>
+      <div class="code-block step" data-step="3">
+        <span class="code-label">프롬프트</span><span class="key">Google Calendar에 아래 미팅을 추가해줘.</span>
+
+<span class="val">- 제목: [클라이언트명] 제안 미팅</span>
+<span class="val">- 날짜: [날짜 입력]</span>
+<span class="val">- 시간: 오후 2:00 ~ 3:30</span>
+<span class="val">- 장소: [장소 또는 화상회의 링크]</span>
+<span class="val">- 참석자: [이메일 목록]</span>
+<span class="val">- 설명: Q3 프로젝트 제안서 발표 및 피드백 수렴</span>
+<span class="val">- 알림: 30분 전 / 하루 전</span></div>
+      <div class="callout step" data-step="4">💡 알림을 복수로 설정할 수 있어 중요 미팅을 놓치지 않습니다.</div>
+    </div>
+  </section>
+
+  <!-- ── Slide 4: 실습 3 — 일정 조율 ── -->
+  <section class="slide slide-4" id="slide-4">
+    <div class="content">
+      <div class="label green step" data-step="1">실습 3 — 일정 조율 + 등록</div>
+      <h2 class="subtitle step" data-step="2">🗓 여러 명의 일정 조율 후 자동 등록</h2>
+      <div class="scenario step" data-step="2">
+        🔄 여러 참석자의 가능한 시간대를 찾고 바로 캘린더에 등록합니다.
+      </div>
+      <div class="code-block step" data-step="3">
+        <span class="code-label">프롬프트</span><span class="key">아래 조건에 맞는 미팅 시간을 찾고 Google Calendar에 등록해줘.</span>
+
+<span class="val">- 참석자: [이메일 목록]</span>
+<span class="val">- 희망 기간: 이번 주 수~금</span>
+<span class="val">- 소요 시간: 1시간</span>
+<span class="val">- 회피 시간대: 점심시간(12~1시), 오후 5시 이후</span>
+<span class="val">- 제목: 신규 프로젝트 킥오프 미팅</span></div>
+      <div class="callout step" data-step="4">⚡ Claude가 참석자 캘린더를 확인해 빈 시간을 자동으로 찾아줍니다.</div>
+    </div>
+  </section>
+
+  <!-- ── Slide 5: 실습 4 — 조회 및 관리 ── -->
+  <section class="slide slide-5" id="slide-5">
+    <div class="content content-wide">
+      <div class="label step" data-step="1">실습 4 — 조회 &amp; 관리</div>
+      <h2 class="subtitle step" data-step="2">🔍 일정 조회 및 관리 프롬프트</h2>
+      <div class="two-col">
+        <div class="step" data-step="3">
+          <div class="query-group">
+            <div class="query-title">📋 이번 주 일정 확인</div>
+            <div class="query-item">이번 주 내 Google Calendar 일정을 요약해줘</div>
+          </div>
+          <div class="query-group">
+            <div class="query-title">🔎 특정 기간 조회</div>
+            <div class="query-item">다음 달 예정된 외부 미팅만 보여줘</div>
+          </div>
+        </div>
+        <div class="step" data-step="4">
+          <div class="query-group">
+            <div class="query-title">✏️ 일정 수정</div>
+            <div class="query-item">다음 주 월요일 전체회의 시간을 오전 9시로 변경해줘</div>
+          </div>
+          <div class="query-group">
+            <div class="query-title">🗑 일정 삭제</div>
+            <div class="query-item">[날짜]에 있는 [미팅명] 일정을 삭제해줘</div>
+          </div>
+        </div>
+      </div>
+      <div class="callout step" data-step="5">🗓 결과 확인: <strong>이번 달 월요일에 등록된 일정 목록을 보여줘</strong></div>
+    </div>
+  </section>
+
+  <!-- ── Slide 6: 반복 일정 옵션 ── -->
+  <section class="slide slide-6" id="slide-6">
+    <div class="content">
+      <div class="label step" data-step="1">반복 설정 가이드</div>
+      <h2 class="subtitle step" data-step="2">💡 반복 일정 설정 옵션</h2>
+      <div class="divider step" data-step="2"></div>
+      <div class="table-wrap step" data-step="3">
+        <table>
+          <thead>
+            <tr><th>옵션</th><th>프롬프트 예시</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="chip">매주 특정 요일</span></td>
+              <td>"매주 화요일 오후 3시"</td>
+            </tr>
+            <tr>
+              <td><span class="chip">격주</span></td>
+              <td>"격주 금요일 오전 10시"</td>
+            </tr>
+            <tr>
+              <td><span class="chip">매월 특정일</span></td>
+              <td>"매월 마지막 금요일"</td>
+            </tr>
+            <tr>
+              <td><span class="chip">평일 매일</span></td>
+              <td>"평일 매일 오전 9시"</td>
+            </tr>
+            <tr>
+              <td><span class="chip">종료일 지정</span></td>
+              <td>"올해 말까지만 반복"</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout step" data-step="4">📌 자연어로 원하는 반복 패턴을 말하면 Claude가 알아서 설정합니다.</div>
+    </div>
+  </section>
+
+  <!-- ── Slide 7: 체크리스트 ── -->
+  <section class="slide slide-7" id="slide-7">
+    <div class="content">
+      <div class="label step" data-step="1">실습 완료 확인</div>
+      <h2 class="subtitle step" data-step="2">✅ 체크리스트</h2>
+      <div class="divider step" data-step="2"></div>
+      <ul class="checklist">
+        <li class="step" data-step="3">
+          <div class="check-box"></div>
+          <span>매주 월요일 전체회의 반복 일정을 등록했다</span>
+        </li>
+        <li class="step" data-step="4">
+          <div class="check-box"></div>
+          <span>특정 날 외부 미팅을 추가했다</span>
+        </li>
+        <li class="step" data-step="5">
+          <div class="check-box"></div>
+          <span>일정 조회 프롬프트를 실행했다</span>
+        </li>
+        <li class="step" data-step="6">
+          <div class="check-box"></div>
+          <span>일정 수정 또는 삭제를 해봤다</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── UI ── -->
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+  <div id="counter">1 / 7</div>
+  <div id="key-hint">
+    <kbd>←</kbd><kbd>→</kbd> 이동&nbsp;&nbsp;<kbd>F</kbd> 전체화면
+  </div>
+</div>
+
+<script>
+(function () {
+  const SLIDES = document.querySelectorAll('.slide');
+  const TOTAL = SLIDES.length;
+  const DURATION = 420;
+  const STAGGER = 110;
+  const fill = document.getElementById('progress-fill');
+  const counter = document.getElementById('counter');
+  const hint = document.getElementById('key-hint');
+
+  let cur = 0, busy = false, timers = [];
+
+  function resetSteps(slide) {
+    slide.querySelectorAll('.step').forEach(el => el.classList.remove('visible'));
+  }
+
+  function showStaggered(slide) {
+    timers.forEach(clearTimeout); timers = [];
+    const groups = {};
+    slide.querySelectorAll('.step').forEach(el => {
+      const k = el.dataset.step || 0;
+      (groups[k] = groups[k] || []).push(el);
+    });
+    Object.keys(groups).sort((a, b) => +a - +b).forEach((k, i) => {
+      timers.push(setTimeout(() => {
+        groups[k].forEach(el => el.classList.add('visible'));
+      }, i * STAGGER));
+    });
+  }
+
+  function updateUI() {
+    const pct = TOTAL <= 1 ? 100 : (cur / (TOTAL - 1)) * 100;
+    fill.style.width = pct + '%';
+    counter.textContent = (cur + 1) + ' / ' + TOTAL;
+  }
+
+  function goTo(idx, instant) {
+    if (busy && !instant) return;
+    if (idx < 0 || idx >= TOTAL) return;
+    busy = true;
+    const prev = SLIDES[cur];
+    const next = SLIDES[idx];
+    if (prev === next) { busy = false; return; }
+
+    timers.forEach(clearTimeout); timers = [];
+    prev.classList.add('exit');
+    prev.classList.remove('active');
+    resetSteps(prev);
+
+    next.classList.add('active');
+    next.classList.remove('exit');
+    cur = idx;
+    updateUI();
+
+    const done = () => { prev.classList.remove('exit'); busy = false; showStaggered(next); };
+    const t = setTimeout(done, DURATION + 50);
+    next.addEventListener('transitionend', function handler() {
+      clearTimeout(t); next.removeEventListener('transitionend', handler); done();
+    }, { once: true });
+
+    const hash = '#slide-' + (idx + 1);
+    if (location.hash !== hash) history.replaceState(null, '', hash);
+  }
+
+  updateUI();
+  showStaggered(SLIDES[0]);
+
+  const initIdx = parseInt((location.hash || '').replace('#slide-', '')) - 1;
+  if (!isNaN(initIdx) && initIdx > 0) goTo(initIdx, true);
+
+  document.addEventListener('keydown', e => {
+    hint.style.opacity = '0';
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); goTo(cur + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goTo(cur - 1); }
+    else if (e.key === 'Home') goTo(0);
+    else if (e.key === 'End') goTo(TOTAL - 1);
+    else if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+      else document.exitFullscreen?.();
+    }
+  });
+
+  let tx = 0;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    const dx = tx - e.changedTouches[0].clientX;
+    if (Math.abs(dx) > 48) goTo(cur + (dx > 0 ? 1 : -1));
+  });
+
+  window.addEventListener('hashchange', () => {
+    const idx = parseInt(location.hash.replace('#slide-', '')) - 1;
+    if (!isNaN(idx) && idx !== cur) goTo(idx, true);
+  });
+})();
+</script>
+</body>
+</html>

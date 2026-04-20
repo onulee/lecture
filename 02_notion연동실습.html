@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[2강] Notion 연동 실습 — 업무 미팅 항목 작성</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Inter:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0A0A0F;
+    --text: #E8E4F0;
+    --muted: #8880A0;
+    --accent: #7C3AED;
+    --accent2: #A78BFA;
+    --accent3: #C4B5FD;
+    --notion: #E8744F;
+    --notion2: #F0956E;
+    --green: #34D399;
+    --border: rgba(124, 58, 237, 0.25);
+    --card-bg: rgba(124, 58, 237, 0.08);
+    --duration: 420ms;
+    --stagger: 110ms;
+  }
+
+  html, body {
+    width: 100%; height: 100dvh;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #app {
+    position: relative;
+    width: 100%; height: 100dvh;
+    overflow: hidden;
+  }
+
+  /* ── Slides ── */
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0;
+    transform: translate3d(60px, 0, 0);
+    transition: opacity var(--duration) ease, transform var(--duration) ease;
+    pointer-events: none;
+    padding: 40px 60px;
+  }
+  .slide.active {
+    opacity: 1; transform: translate3d(0, 0, 0);
+    pointer-events: auto;
+  }
+  .slide.exit {
+    opacity: 0; transform: translate3d(-60px, 0, 0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide { transition: none; }
+  }
+
+  /* ── Step elements ── */
+  .step { opacity: 0; transform: translate3d(0, 20px, 0); transition: opacity 0.35s ease, transform 0.35s ease; }
+  .step.visible { opacity: 1; transform: translate3d(0, 0, 0); }
+
+  /* ── Backgrounds ── */
+  .slide-1 { background: radial-gradient(ellipse 80% 60% at 30% 40%, rgba(124,58,237,0.18) 0%, transparent 70%), radial-gradient(ellipse 60% 80% at 75% 70%, rgba(232,116,79,0.12) 0%, transparent 65%), var(--bg); }
+  .slide-2 { background: radial-gradient(ellipse 70% 50% at 20% 30%, rgba(124,58,237,0.15) 0%, transparent 60%), var(--bg); }
+  .slide-3 { background: radial-gradient(ellipse 60% 60% at 80% 20%, rgba(232,116,79,0.14) 0%, transparent 65%), var(--bg); }
+  .slide-4 { background: radial-gradient(ellipse 70% 50% at 15% 70%, rgba(167,139,250,0.12) 0%, transparent 65%), var(--bg); }
+  .slide-5 { background: radial-gradient(ellipse 60% 60% at 75% 30%, rgba(52,211,153,0.10) 0%, transparent 65%), var(--bg); }
+  .slide-6 { background: radial-gradient(ellipse 70% 60% at 25% 60%, rgba(124,58,237,0.14) 0%, transparent 65%), var(--bg); }
+  .slide-7 { background: radial-gradient(ellipse 60% 50% at 70% 40%, rgba(232,116,79,0.12) 0%, transparent 65%), var(--bg); }
+  .slide-8 { background: radial-gradient(ellipse 80% 60% at 40% 50%, rgba(52,211,153,0.12) 0%, transparent 65%), var(--bg); }
+
+  /* ── Content wrappers ── */
+  .content {
+    width: 100%; max-width: 960px;
+    display: flex; flex-direction: column;
+    gap: 0;
+  }
+  .content-wide { max-width: 1100px; }
+
+  /* ── Typography ── */
+  .label {
+    font-size: clamp(10px, 1.1vw, 13px);
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 18px;
+  }
+  .label.notion-color { color: var(--notion2); }
+
+  .title {
+    font-size: clamp(28px, 4.5vw, 56px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .subtitle {
+    font-size: clamp(18px, 2.5vw, 30px);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text);
+    margin-bottom: 24px;
+  }
+
+  .body {
+    font-size: clamp(13px, 1.4vw, 17px);
+    line-height: 1.8;
+    color: #C8C0DC;
+  }
+
+  .divider {
+    width: 56px; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--notion));
+    border-radius: 2px;
+    margin: 20px 0 28px;
+  }
+
+  /* ── Callout ── */
+  .callout {
+    background: rgba(124,58,237,0.12);
+    border-left: 3px solid var(--accent2);
+    border-radius: 8px;
+    padding: 18px 22px;
+    font-size: clamp(12px, 1.3vw, 15px);
+    line-height: 1.7;
+    color: #C8C0DC;
+  }
+  .callout strong { color: var(--accent3); }
+
+  /* ── Table ── */
+  .table-wrap {
+    overflow: auto;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: clamp(11px, 1.15vw, 14px);
+  }
+  th {
+    background: rgba(124,58,237,0.2);
+    color: var(--accent3);
+    font-weight: 600;
+    padding: 12px 16px;
+    text-align: left;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(124,58,237,0.1);
+    color: #C8C0DC;
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(124,58,237,0.06); }
+  td strong { color: var(--text); }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    background: rgba(124,58,237,0.2);
+    color: var(--accent3);
+  }
+
+  /* ── Code block ── */
+  .code-block {
+    background: #12101A;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(11px, 1.1vw, 13px);
+    line-height: 1.8;
+    color: #C4B5FD;
+    white-space: pre-wrap;
+    overflow: auto;
+    position: relative;
+  }
+  .code-label {
+    position: absolute;
+    top: 10px; right: 14px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+  }
+  .code-block .comment { color: #6B7280; }
+  .code-block .key { color: #A78BFA; }
+  .code-block .val { color: #34D399; }
+
+  /* ── Lists ── */
+  .list {
+    list-style: none;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .list li {
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: clamp(13px, 1.4vw, 16px);
+    line-height: 1.6;
+    color: #C8C0DC;
+  }
+  .list li .icon {
+    flex-shrink: 0;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: rgba(124,58,237,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    margin-top: 1px;
+  }
+
+  /* ── Cards ── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+  .card-title {
+    font-size: clamp(13px, 1.3vw, 15px);
+    font-weight: 600;
+    color: var(--accent3);
+    margin-bottom: 8px;
+  }
+  .card-body {
+    font-size: clamp(12px, 1.2vw, 14px);
+    line-height: 1.7;
+    color: #A89CC0;
+  }
+
+  /* ── Checklist ── */
+  .checklist {
+    list-style: none;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .checklist li {
+    display: flex; align-items: flex-start; gap: 14px;
+    font-size: clamp(14px, 1.5vw, 18px);
+    line-height: 1.5;
+    color: #C8C0DC;
+  }
+  .check-box {
+    flex-shrink: 0;
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    border: 2px solid var(--accent);
+    margin-top: 1px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .check-box.done { background: var(--green); border-color: var(--green); }
+  .check-box.done::after { content: '✓'; font-size: 13px; color: #0A0A0F; font-weight: 700; }
+
+  /* ── Two-col layout ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  /* ── Query pills ── */
+  .query-list {
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .query-item {
+    background: #12101A;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(11px, 1.15vw, 13px);
+    color: #C4B5FD;
+    line-height: 1.5;
+  }
+
+  /* ── Progress & Counter ── */
+  #progress-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 3px; background: rgba(255,255,255,0.06); z-index: 100;
+  }
+  #progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--notion));
+    transition: width var(--duration) ease;
+  }
+  #counter {
+    position: fixed; bottom: 16px; right: 24px;
+    font-size: 12px; font-weight: 500;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.06em;
+    z-index: 100;
+  }
+  #key-hint {
+    position: fixed; bottom: 16px; left: 24px;
+    font-size: 11px; color: var(--muted);
+    display: flex; gap: 8px; align-items: center;
+    z-index: 100;
+    transition: opacity 0.4s;
+  }
+  #key-hint kbd {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+  }
+
+  /* ── Notion badge ── */
+  .notion-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(232,116,79,0.12);
+    border: 1px solid rgba(232,116,79,0.3);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px; font-weight: 500;
+    color: var(--notion2);
+    margin-bottom: 16px;
+  }
+  .notion-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--notion2);
+    animation: pulse 2s ease infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* ── Tag row ── */
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .tag {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px; font-weight: 500;
+    background: rgba(167,139,250,0.12);
+    border: 1px solid rgba(167,139,250,0.25);
+    color: var(--accent3);
+  }
+  .tag.orange { background: rgba(232,116,79,0.12); border-color: rgba(232,116,79,0.3); color: var(--notion2); }
+
+  /* Step number badge */
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--notion));
+    font-size: 13px; font-weight: 700;
+    color: white; flex-shrink: 0;
+    margin-right: 10px;
+  }
+
+  @media (max-width: 768px) {
+    .slide { padding: 24px 20px; }
+    .two-col { grid-template-columns: 1fr; gap: 20px; }
+    .cards { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ── Slide 1: Title ── -->
+  <section class="slide slide-1 active" id="slide-1">
+    <div class="content">
+      <div class="notion-badge step" data-step="1">
+        <span class="dot"></span> Claude × Notion 연동 실습
+      </div>
+      <div class="label step" data-step="2">2강</div>
+      <h1 class="title step" data-step="3">📝 Notion 연동 실습</h1>
+      <h2 class="title step" data-step="3" style="color:var(--accent3); font-size:clamp(22px,3vw,40px);">업무 미팅 항목 작성</h2>
+      <div class="divider step" data-step="4"></div>
+      <p class="body step" data-step="4">Claude + Notion 연동으로 <strong style="color:var(--accent3)">업무 미팅 데이터베이스</strong>를 자동으로 구성하고,<br>회의 관련 항목을 Claude가 직접 채워주는 방법을 실습합니다.</p>
+    </div>
+  </section>
+
+  <!-- ── Slide 2: DB 구조 ── -->
+  <section class="slide slide-2" id="slide-2">
+    <div class="content content-wide">
+      <div class="label step" data-step="1">데이터베이스 설계</div>
+      <h2 class="subtitle step" data-step="2">🗂 업무 미팅 데이터베이스 구조</h2>
+      <p class="body step" data-step="2" style="margin-bottom:20px;">실무에서 필요한 미팅 관련 항목을 아래와 같이 설계합니다.</p>
+      <div class="table-wrap step" data-step="3">
+        <table>
+          <thead>
+            <tr><th>항목명</th><th>타입</th><th>설명</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>회의명</strong></td><td><span class="badge">Title</span></td><td>미팅의 이름 (예: 3월 마케팅 전략 회의)</td></tr>
+            <tr><td><strong>날짜</strong></td><td><span class="badge">Date</span></td><td>회의 일시</td></tr>
+            <tr><td><strong>참석자</strong></td><td><span class="badge">People</span></td><td>참석하는 팀원</td></tr>
+            <tr><td><strong>안건</strong></td><td><span class="badge">Text</span></td><td>논의할 주요 안건 목록</td></tr>
+            <tr><td><strong>회의록</strong></td><td><span class="badge">Text</span></td><td>회의 중 작성된 내용 요약</td></tr>
+            <tr><td><strong>결정 사항</strong></td><td><span class="badge">Text</span></td><td>회의에서 결정된 내용</td></tr>
+            <tr><td><strong>Action Item</strong></td><td><span class="badge">Text</span></td><td>후속 조치 및 할 일 목록</td></tr>
+            <tr><td><strong>담당자</strong></td><td><span class="badge">People</span></td><td>Action Item 별 담당자</td></tr>
+            <tr><td><strong>마감일</strong></td><td><span class="badge">Date</span></td><td>Action Item 마감 기한</td></tr>
+            <tr><td><strong>상태</strong></td><td><span class="badge">Select</span></td><td>예정 / 진행 중 / 완료</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Slide 3: 실습 1 ── -->
+  <section class="slide slide-3" id="slide-3">
+    <div class="content">
+      <div class="label notion-color step" data-step="1">실습 1</div>
+      <h2 class="subtitle step" data-step="2">🧪 미팅 항목 데이터베이스 생성</h2>
+      <div class="divider step" data-step="2"></div>
+      <div class="code-block step" data-step="3">
+        <span class="code-label">프롬프트</span><span class="key">Notion에 "업무 미팅 관리" 데이터베이스를 만들어줘.</span>
+
+<span class="comment">아래 항목을 포함해서 만들어줘:</span>
+<span class="val">- 회의명 (제목)</span>
+<span class="val">- 날짜 (날짜/시간)</span>
+<span class="val">- 참석자 (사람)</span>
+<span class="val">- 안건 (텍스트)</span>
+<span class="val">- 회의록 (텍스트)</span>
+<span class="val">- 결정 사항 (텍스트)</span>
+<span class="val">- Action Item (텍스트)</span>
+<span class="val">- 담당자 (사람)</span>
+<span class="val">- 마감일 (날짜)</span>
+<span class="val">- 상태 (선택: 예정/진행 중/완료)</span></div>
+      <div class="callout step" data-step="4">✏️ <strong>직접 해보기</strong>: 위 프롬프트를 Claude에 붙여넣고 실행해보세요.</div>
+    </div>
+  </section>
+
+  <!-- ── Slide 4: 실습 2 ── -->
+  <section class="slide slide-4" id="slide-4">
+    <div class="content">
+      <div class="label notion-color step" data-step="1">실습 2</div>
+      <h2 class="subtitle step" data-step="2">🧪 새 미팅 항목 자동 입력</h2>
+      <div class="divider step" data-step="2"></div>
+      <div class="code-block step" data-step="3">
+        <span class="code-label">프롬프트</span><span class="key">Notion 업무 미팅 관리 데이터베이스에 새 항목을 추가해줘.</span>
+
+<span class="comment">회의 정보:</span>
+<span class="val">- 회의명: Q2 마케팅 전략 회의</span>
+<span class="val">- 날짜: [날짜 입력]</span>
+<span class="val">- 참석자: 기획팀 전원</span>
+<span class="val">- 안건:</span>
+<span class="val">  1. Q2 캠페인 예산 검토</span>
+<span class="val">  2. SNS 채널 운영 방향</span>
+<span class="val">  3. 협력사 미팅 일정 조율</span>
+<span class="val">- 상태: 예정</span></div>
+      <div class="callout step" data-step="4">💡 날짜와 참석자를 실제 정보로 바꿔서 실행해보세요.</div>
+    </div>
+  </section>
+
+  <!-- ── Slide 5: 실습 3 ── -->
+  <section class="slide slide-5" id="slide-5">
+    <div class="content">
+      <div class="label notion-color step" data-step="1">실습 3</div>
+      <h2 class="subtitle step" data-step="2">🧪 회의록 자동 정리 후 Notion 저장</h2>
+      <div class="divider step" data-step="2"></div>
+      <div class="code-block step" data-step="3">
+        <span class="code-label">프롬프트</span><span class="key">아래는 방금 끝난 미팅 메모야.</span>
+<span class="key">이것을 정리해서 Notion 업무 미팅 관리 데이터베이스에 저장해줘.</span>
+
+<span class="comment">[내 회의 메모 붙여넣기]</span>
+
+<span class="val">아래 항목으로 분리해서 저장해:</span>
+<span class="val">- 회의록 (주요 논의 내용 요약)</span>
+<span class="val">- 결정 사항 (확정된 내용만)</span>
+<span class="val">- Action Item (담당자/할 일/마감일 표 형식)</span>
+<span class="val">- 상태: 완료</span></div>
+      <div class="callout step" data-step="4">📋 메모나 녹취 텍스트를 붙여넣으면 Claude가 자동으로 구조화합니다.</div>
+    </div>
+  </section>
+
+  <!-- ── Slide 6: 실습 4 ── -->
+  <section class="slide slide-6" id="slide-6">
+    <div class="content">
+      <div class="label notion-color step" data-step="1">실습 4</div>
+      <h2 class="subtitle step" data-step="2">🧪 미팅 현황 조회</h2>
+      <div class="divider step" data-step="2"></div>
+      <div class="query-list step" data-step="3">
+        <div class="query-item">Notion에서 이번 주 예정된 미팅 목록을 보여줘</div>
+        <div class="query-item">Notion에서 완료되지 않은 Action Item이 있는 미팅을 찾아줘</div>
+        <div class="query-item">[담당자 이름]에게 배정된 Action Item 목록을 Notion에서 조회해줘</div>
+      </div>
+      <div class="callout step" data-step="4">🔍 조회 프롬프트를 활용하면 Notion DB를 자연어로 검색할 수 있습니다.</div>
+    </div>
+  </section>
+
+  <!-- ── Slide 7: 활용 팁 ── -->
+  <section class="slide slide-7" id="slide-7">
+    <div class="content content-wide">
+      <div class="label step" data-step="1">Claude 활용 가이드</div>
+      <h2 class="subtitle step" data-step="2">📋 항목별 Claude 활용 팁</h2>
+      <div class="cards step" data-step="3">
+        <div class="card">
+          <div class="card-title">📌 안건</div>
+          <div class="card-body">미팅 목적을 말하면 안건 초안을 자동으로 작성해줍니다.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">📝 회의록</div>
+          <div class="card-body">녹취나 메모를 붙여넣으면 핵심 내용을 자동으로 요약합니다.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">✅ Action Item</div>
+          <div class="card-body">회의록에서 할 일을 자동 추출하고 담당자까지 배정합니다.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">📧 후속 이메일</div>
+          <div class="card-body">회의록 기반으로 참석자 공유용 이메일을 자동 생성합니다.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Slide 8: 체크리스트 ── -->
+  <section class="slide slide-8" id="slide-8">
+    <div class="content">
+      <div class="label step" data-step="1">실습 완료 확인</div>
+      <h2 class="subtitle step" data-step="2">✅ 체크리스트</h2>
+      <div class="divider step" data-step="2"></div>
+      <ul class="checklist">
+        <li class="step" data-step="3">
+          <div class="check-box"></div>
+          <span>업무 미팅 데이터베이스를 Notion에 생성했다</span>
+        </li>
+        <li class="step" data-step="4">
+          <div class="check-box"></div>
+          <span>새 미팅 항목을 Claude로 추가했다</span>
+        </li>
+        <li class="step" data-step="5">
+          <div class="check-box"></div>
+          <span>회의 메모를 회의록으로 변환해 저장했다</span>
+        </li>
+        <li class="step" data-step="6">
+          <div class="check-box"></div>
+          <span>미팅 현황 조회 프롬프트를 실행해봤다</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── UI ── -->
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+  <div id="counter">1 / 8</div>
+  <div id="key-hint">
+    <kbd>←</kbd><kbd>→</kbd> 이동&nbsp;&nbsp;<kbd>F</kbd> 전체화면
+  </div>
+</div>
+
+<script>
+(function () {
+  const SLIDES = document.querySelectorAll('.slide');
+  const TOTAL = SLIDES.length;
+  const DURATION = 420;
+  const STAGGER = 110;
+  const fill = document.getElementById('progress-fill');
+  const counter = document.getElementById('counter');
+  const hint = document.getElementById('key-hint');
+
+  let cur = 0, busy = false, timers = [];
+
+  function resetSteps(slide) {
+    slide.querySelectorAll('.step').forEach(el => {
+      el.classList.remove('visible');
+    });
+  }
+
+  function showStaggered(slide) {
+    timers.forEach(clearTimeout); timers = [];
+    const steps = [...slide.querySelectorAll('.step')]
+      .sort((a, b) => (+a.dataset.step || 0) - (+b.dataset.step || 0));
+    const groups = {};
+    steps.forEach(el => {
+      const k = el.dataset.step || 0;
+      (groups[k] = groups[k] || []).push(el);
+    });
+    Object.keys(groups).sort((a,b)=>+a-+b).forEach((k, i) => {
+      timers.push(setTimeout(() => {
+        groups[k].forEach(el => el.classList.add('visible'));
+      }, i * STAGGER));
+    });
+  }
+
+  function updateUI() {
+    const pct = TOTAL <= 1 ? 100 : (cur / (TOTAL - 1)) * 100;
+    fill.style.width = pct + '%';
+    counter.textContent = (cur + 1) + ' / ' + TOTAL;
+  }
+
+  function goTo(idx, instant) {
+    if (busy && !instant) return;
+    if (idx < 0 || idx >= TOTAL) return;
+    busy = true;
+    const prev = SLIDES[cur];
+    const next = SLIDES[idx];
+    if (prev === next) { busy = false; return; }
+
+    timers.forEach(clearTimeout); timers = [];
+    prev.classList.add('exit');
+    prev.classList.remove('active');
+    resetSteps(prev);
+
+    next.classList.add('active');
+    next.classList.remove('exit');
+    cur = idx;
+    updateUI();
+
+    const done = () => { prev.classList.remove('exit'); busy = false; showStaggered(next); };
+    const t = setTimeout(done, DURATION + 50);
+    next.addEventListener('transitionend', function handler() {
+      clearTimeout(t); next.removeEventListener('transitionend', handler); done();
+    }, { once: true });
+
+    const hash = '#slide-' + (idx + 1);
+    if (location.hash !== hash) history.replaceState(null, '', hash);
+  }
+
+  // Init
+  updateUI();
+  showStaggered(SLIDES[0]);
+
+  // Hash
+  const initIdx = parseInt((location.hash || '').replace('#slide-', '')) - 1;
+  if (!isNaN(initIdx) && initIdx > 0) goTo(initIdx, true);
+
+  // Keyboard
+  document.addEventListener('keydown', e => {
+    hint.style.opacity = '0';
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); goTo(cur + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goTo(cur - 1); }
+    else if (e.key === 'Home') goTo(0);
+    else if (e.key === 'End') goTo(TOTAL - 1);
+    else if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+      else document.exitFullscreen?.();
+    }
+  });
+
+  // Touch
+  let tx = 0;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    const dx = tx - e.changedTouches[0].clientX;
+    if (Math.abs(dx) > 48) goTo(cur + (dx > 0 ? 1 : -1));
+  });
+
+  window.addEventListener('hashchange', () => {
+    const idx = parseInt(location.hash.replace('#slide-', '')) - 1;
+    if (!isNaN(idx) && idx !== cur) goTo(idx, true);
+  });
+})();
+</script>
+</body>
+</html>

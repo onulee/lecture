@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>[1강] Claude 커넥터 연결 방법</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --duration: 400ms;
+    --stagger: 120ms;
+    --ease: cubic-bezier(.4,0,.2,1);
+    --bg: #0E0C08;
+    --text: #F0E8D8;
+    --muted: #A09880;
+    --accent-purple: #A78BFA;
+    --accent-blue: #60A5FA;
+    --accent-green: #34D399;
+    --accent-yellow: #FBBF24;
+    --surface: rgba(255,255,255,.05);
+    --border: rgba(255,255,255,.1);
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', 'Inter', sans-serif;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #app {
+    position: relative;
+    width: 100%; height: 100dvh;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+
+  /* ── Slides ── */
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration) var(--ease), transform var(--duration) var(--ease);
+    transform: translate3d(60px, 0, 0);
+  }
+  .slide.active {
+    opacity: 1; pointer-events: auto;
+    transform: translate3d(0, 0, 0);
+  }
+  .slide.exit-left  { opacity: 0; transform: translate3d(-60px, 0, 0); }
+  .slide.exit-right { opacity: 0; transform: translate3d(60px, 0, 0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide { transition: opacity var(--duration) var(--ease); transform: none !important; }
+  }
+
+  /* ── Content wrapper ── */
+  .content {
+    width: min(900px, 90vw);
+    padding: 2rem;
+    display: flex; flex-direction: column; gap: 1.5rem;
+  }
+  .content.wide { width: min(1100px, 94vw); }
+
+  /* ── Typography ── */
+  .label {
+    font-size: clamp(.65rem, 1.2vw, .8rem);
+    font-weight: 600; letter-spacing: .15em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .title {
+    font-size: clamp(2rem, 5.5vw, 4rem);
+    font-weight: 900; line-height: 1.1; letter-spacing: -.02em;
+  }
+  .subtitle {
+    font-size: clamp(1.2rem, 2.8vw, 2rem);
+    font-weight: 700; line-height: 1.25;
+  }
+  .body {
+    font-size: clamp(.85rem, 1.6vw, 1.05rem);
+    font-weight: 400; line-height: 1.75; color: #C8BEA8;
+  }
+  .big {
+    font-size: clamp(1rem, 2vw, 1.35rem);
+    font-weight: 500; line-height: 1.6;
+  }
+  .highlight { color: var(--accent-yellow); }
+  .accent-purple { color: var(--accent-purple); }
+  .accent-blue   { color: var(--accent-blue); }
+  .accent-green  { color: var(--accent-green); }
+
+  .divider {
+    height: 2px; border-radius: 1px;
+    background: linear-gradient(90deg, var(--accent-purple) 0%, transparent 100%);
+    width: 80px;
+  }
+
+  /* ── Steps (staggered reveal) ── */
+  .step { opacity: 0; transform: translate3d(0, 18px, 0); transition: none; }
+  .step.visible {
+    opacity: 1; transform: translate3d(0, 0, 0);
+    transition: opacity .35s var(--ease), transform .35s var(--ease);
+  }
+
+  /* ── Callout ── */
+  .callout {
+    background: rgba(167,139,250,.08);
+    border-left: 3px solid var(--accent-purple);
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.25rem;
+    font-size: clamp(.8rem, 1.4vw, .95rem);
+    line-height: 1.65; color: #D4CCB8;
+  }
+  .callout.blue  { background: rgba(96,165,250,.08); border-left-color: var(--accent-blue); }
+  .callout.green { background: rgba(52,211,153,.08); border-left-color: var(--accent-green); }
+  .callout.yellow{ background: rgba(251,191,36,.08);  border-left-color: var(--accent-yellow); }
+
+  /* ── Table ── */
+  .step-table { width: 100%; border-collapse: collapse; }
+  .step-table th {
+    padding: .6rem 1rem; text-align: left;
+    font-size: clamp(.7rem, 1.2vw, .8rem); font-weight: 600;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .step-table td {
+    padding: .65rem 1rem;
+    font-size: clamp(.78rem, 1.3vw, .9rem); line-height: 1.55;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    color: #D0C8B8;
+  }
+  .step-table td:first-child {
+    font-weight: 700; font-size: clamp(.9rem,1.6vw,1.1rem);
+    color: var(--text); width: 56px; text-align: center;
+  }
+  .step-table tr:last-child td { border-bottom: none; }
+
+  /* ── Feature list ── */
+  .feature-list { list-style: none; display: flex; flex-direction: column; gap: .55rem; }
+  .feature-list li {
+    display: flex; align-items: flex-start; gap: .6rem;
+    font-size: clamp(.78rem, 1.3vw, .92rem); line-height: 1.6; color: #C8BEA8;
+  }
+  .feature-list li::before {
+    content: '▸';
+    flex-shrink: 0; margin-top: .1em;
+  }
+
+  /* ── Code block ── */
+  .code-block {
+    background: rgba(0,0,0,.4); border: 1px solid var(--border);
+    border-radius: 8px; padding: .9rem 1.1rem;
+    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    font-size: clamp(.72rem, 1.2vw, .85rem); line-height: 1.7;
+    color: #B8E0A8; overflow-x: auto;
+  }
+  .code-block .cmt { color: var(--muted); }
+
+  /* ── Checklist ── */
+  .checklist { list-style: none; display: flex; flex-direction: column; gap: .7rem; }
+  .checklist li {
+    display: flex; align-items: center; gap: .75rem;
+    font-size: clamp(.82rem, 1.4vw, .98rem); line-height: 1.55; color: #C8BEA8;
+  }
+  .check-box {
+    width: 20px; height: 20px; border-radius: 4px;
+    border: 2px solid var(--border);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── Tag badge ── */
+  .badge {
+    display: inline-block;
+    padding: .2rem .6rem; border-radius: 100px;
+    font-size: clamp(.62rem, 1vw, .75rem); font-weight: 600;
+    letter-spacing: .06em;
+  }
+  .badge-purple { background: rgba(167,139,250,.18); color: var(--accent-purple); }
+  .badge-blue   { background: rgba(96,165,250,.18);  color: var(--accent-blue); }
+  .badge-green  { background: rgba(52,211,153,.18);  color: var(--accent-green); }
+  .badge-yellow { background: rgba(251,191,36,.18);  color: var(--accent-yellow); }
+
+  /* ── Two-column layout ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  .col-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.4rem;
+    display: flex; flex-direction: column; gap: .75rem;
+  }
+
+  /* ── Connector icon strip ── */
+  .connector-icons {
+    display: flex; gap: 2rem; align-items: center;
+  }
+  .conn-icon {
+    display: flex; flex-direction: column; align-items: center; gap: .45rem;
+    font-size: clamp(.62rem, 1vw, .75rem); font-weight: 500; color: var(--muted);
+  }
+  .conn-icon .icon-circle {
+    width: clamp(44px, 6vw, 64px); height: clamp(44px, 6vw, 64px);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+    border: 2px solid var(--border);
+  }
+
+  /* ── Progress + Counter ── */
+  #progress-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 3px;
+    background: rgba(255,255,255,.06); z-index: 100;
+  }
+  #progress-fill {
+    height: 100%; background: var(--accent-purple);
+    transition: width var(--duration) var(--ease);
+  }
+  #counter {
+    position: fixed; bottom: 1rem; right: 1.2rem;
+    font-size: .72rem; font-weight: 500; color: var(--muted);
+    letter-spacing: .08em; z-index: 100;
+  }
+  #key-hint {
+    position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%);
+    display: flex; gap: .5rem; align-items: center;
+    font-size: .7rem; color: var(--muted); z-index: 100;
+    transition: opacity .4s;
+  }
+  #key-hint kbd {
+    background: rgba(255,255,255,.08); border: 1px solid var(--border);
+    border-radius: 4px; padding: .15rem .45rem;
+    font-family: inherit; font-size: .68rem;
+  }
+
+  /* ─────────── Per-slide backgrounds ─────────── */
+  .slide-1 { background: radial-gradient(ellipse 80% 60% at 30% 40%, rgba(88,28,135,.35) 0%, transparent 70%), linear-gradient(160deg, #100D1A 0%, #0E0C08 60%); }
+  .slide-2 { background: radial-gradient(ellipse 70% 55% at 70% 30%, rgba(30,27,75,.45) 0%, transparent 65%), linear-gradient(145deg, #0D0F1C 0%, #0E0C08 55%); }
+  .slide-3 { background: radial-gradient(ellipse 65% 50% at 20% 70%, rgba(55,20,100,.3) 0%, transparent 65%), #0E0C08; }
+  .slide-4 { background: radial-gradient(ellipse 70% 55% at 75% 25%, rgba(88,28,135,.28) 0%, transparent 65%), #0E0C08; }
+  .slide-5 { background: radial-gradient(ellipse 70% 55% at 25% 30%, rgba(13,44,84,.4) 0%, transparent 65%), #0E0C08; }
+  .slide-6 { background: radial-gradient(ellipse 70% 55% at 70% 65%, rgba(6,78,59,.35) 0%, transparent 65%), #0E0C08; }
+  .slide-7 { background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(30,25,60,.5) 0%, transparent 70%), #0E0C08; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- SLIDE 1 — 타이틀 -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section class="slide slide-1" id="slide-0">
+    <div class="content">
+      <div class="step" data-step="1"><span class="label">Claude 사용법 강의 · 1강</span></div>
+      <div class="step" data-step="2">
+        <h1 class="title">🔌 Claude<br/><span class="accent-purple">커넥터 연결</span> 방법</h1>
+      </div>
+      <div class="step" data-step="3"><div class="divider"></div></div>
+      <div class="step" data-step="4">
+        <p class="big" style="color:#C8BEA8;">Notion &nbsp;·&nbsp; Google Calendar &nbsp;·&nbsp; Figma</p>
+        <p class="body" style="margin-top:.5rem;">외부 서비스와 연동해 대화 한 번으로 실제 데이터를 읽고 씁니다</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- SLIDE 2 — 커넥터란? -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section class="slide slide-2" id="slide-1">
+    <div class="content">
+      <div class="step" data-step="1"><span class="label">개념 이해</span></div>
+      <div class="step" data-step="2"><h2 class="subtitle">커넥터(Connectors)란?</h2></div>
+      <div class="step" data-step="3">
+        <div class="callout">
+          🔌 <strong>커넥터</strong>는 Claude가 외부 서비스와 직접 연동되어 <strong>실제 데이터를 읽고 쓸 수 있게</strong> 해주는 기능입니다.<br/>
+          Notion 페이지 생성, 캘린더 일정 등록, Figma 디자인 제어까지 — 모두 <strong>대화 한 번</strong>으로 가능해져요.
+        </div>
+      </div>
+      <div class="step" data-step="4">
+        <div class="connector-icons">
+          <div class="conn-icon">
+            <div class="icon-circle" style="background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.3);">🟣</div>
+            <span>Notion</span>
+          </div>
+          <div class="conn-icon">
+            <div class="icon-circle" style="background:rgba(96,165,250,.12);border-color:rgba(96,165,250,.3);">🔵</div>
+            <span>Google Calendar</span>
+          </div>
+          <div class="conn-icon">
+            <div class="icon-circle" style="background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.3);">🟢</div>
+            <span>Figma</span>
+          </div>
+        </div>
+      </div>
+      <div class="step" data-step="5">
+        <div class="callout yellow" style="font-size:clamp(.75rem,1.3vw,.88rem);">
+          ⚠️ 커넥터는 <strong>Claude.ai Pro / Team / Enterprise</strong> 플랜에서 사용 가능합니다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- SLIDE 3 — 커넥터 메뉴 접근 방법 -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section class="slide slide-3" id="slide-2">
+    <div class="content">
+      <div class="step" data-step="1"><span class="label">Step 1</span></div>
+      <div class="step" data-step="2"><h2 class="subtitle">커넥터 메뉴 <span class="accent-purple">접근 방법</span></h2></div>
+      <div class="step" data-step="3"><div class="divider"></div></div>
+      <div class="step" data-step="4">
+        <table class="step-table">
+          <thead><tr><th>단계</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td><a href="http://claude.ai" style="color:var(--accent-blue);text-decoration:none;">claude.ai</a> 에 접속해 로그인합니다</td></tr>
+            <tr><td>2</td><td>채팅창 <strong>왼쪽 하단</strong> 또는 <strong>설정(⚙️)</strong> 메뉴를 클릭합니다</td></tr>
+            <tr><td>3</td><td><strong>"Connections"</strong> 또는 <strong>"커넥터"</strong> 탭을 선택합니다</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- SLIDE 4 — Notion 커넥터 -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section class="slide slide-4" id="slide-3">
+    <div class="content wide">
+      <div class="step" data-step="1">
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <span class="badge badge-purple">🟣 Notion</span>
+          <span class="label">커넥터 연결</span>
+        </div>
+      </div>
+      <div class="step" data-step="2">
+        <div class="two-col">
+          <div class="col-card">
+            <p class="label" style="color:var(--accent-purple);">연결 단계</p>
+            <table class="step-table">
+              <tbody>
+                <tr><td>1</td><td>Connections 탭에서 <strong>Notion</strong> 선택</td></tr>
+                <tr><td>2</td><td>"Connect" 버튼 클릭</td></tr>
+                <tr><td>3</td><td>Notion 로그인 팝업에서 <strong>계정 인증</strong></td></tr>
+                <tr><td>4</td><td>연동할 <strong>워크스페이스 선택</strong> 후 허용</td></tr>
+                <tr><td>5</td><td>Claude 화면으로 돌아와 ✅ 연결 확인</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-card">
+            <p class="label" style="color:var(--accent-purple);">연결 후 할 수 있는 것</p>
+            <ul class="feature-list">
+              <li>새 페이지 / 데이터베이스 생성</li>
+              <li>기존 페이지 검색 및 내용 추가</li>
+              <li>데이터베이스에 항목(레코드) 추가</li>
+              <li>페이지 요약 및 내용 분석</li>
+            </ul>
+            <p class="label" style="margin-top:.75rem;color:var(--accent-purple);">실습 프롬프트</p>
+            <div class="code-block">
+"Notion에서 오늘 날짜로<br/>
+&nbsp;새 회의록 페이지를 만들어줘"<br/>
+<span class="cmt">"내 Notion 워크스페이스에서<br/>
+&nbsp;마케팅 관련 페이지를 찾아줘"</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- SLIDE 5 — Google Calendar 커넥터 -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section class="slide slide-5" id="slide-4">
+    <div class="content wide">
+      <div class="step" data-step="1">
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <span class="badge badge-blue">🔵 Google Calendar</span>
+          <span class="label">커넥터 연결</span>
+        </div>
+      </div>
+      <div class="step" data-step="2">
+        <div class="two-col">
+          <div class="col-card">
+            <p class="label" style="color:var(--accent-blue);">연결 단계</p>
+            <table class="step-table">
+              <tbody>
+                <tr><td>1</td><td>Connections 탭에서 <strong>Google Calendar</strong> 선택</td></tr>
+                <tr><td>2</td><td>"Connect" 버튼 클릭</td></tr>
+                <tr><td>3</td><td>Google 계정 선택 및 로그인</td></tr>
+                <tr><td>4</td><td>캘린더 <strong>읽기/쓰기 권한</strong> 허용</td></tr>
+                <tr><td>5</td><td>Claude 화면으로 돌아와 ✅ 연결 확인</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-card">
+            <p class="label" style="color:var(--accent-blue);">연결 후 할 수 있는 것</p>
+            <ul class="feature-list">
+              <li>일정 생성 / 수정 / 삭제</li>
+              <li>특정 기간 일정 조회</li>
+              <li>반복 일정(매주, 매월) 설정</li>
+              <li>참석자 초대 포함 일정 등록</li>
+            </ul>
+            <p class="label" style="margin-top:.75rem;color:var(--accent-blue);">실습 프롬프트</p>
+            <div class="code-block">
+"다음 주 월요일 오전 10시에<br/>
+&nbsp;팀 회의 일정을 추가해줘"<br/>
+<span class="cmt">"이번 달 내 일정을 요약해줘"</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- SLIDE 6 — Figma 커넥터 -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section class="slide slide-6" id="slide-5">
+    <div class="content wide">
+      <div class="step" data-step="1">
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <span class="badge badge-green">🟢 Figma</span>
+          <span class="label">커넥터 연결</span>
+        </div>
+      </div>
+      <div class="step" data-step="2">
+        <div class="two-col">
+          <div class="col-card">
+            <p class="label" style="color:var(--accent-green);">연결 단계</p>
+            <table class="step-table">
+              <tbody>
+                <tr><td>1</td><td>Connections 탭에서 <strong>Figma</strong> 선택</td></tr>
+                <tr><td>2</td><td>"Connect" 버튼 클릭</td></tr>
+                <tr><td>3</td><td>Figma 계정 로그인</td></tr>
+                <tr><td>4</td><td>접근 권한 <strong>허용</strong></td></tr>
+                <tr><td>5</td><td>Claude 화면으로 돌아와 ✅ 연결 확인</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-card">
+            <p class="label" style="color:var(--accent-green);">연결 후 할 수 있는 것</p>
+            <ul class="feature-list">
+              <li>Figma 파일 내용 읽기 및 분석</li>
+              <li>디자인 컴포넌트 정보 조회</li>
+              <li>프레임/레이어 구조 파악</li>
+              <li>코드 커넥트 및 에셋 연동</li>
+            </ul>
+            <p class="label" style="margin-top:.75rem;color:var(--accent-green);">실습 프롬프트</p>
+            <div class="code-block">
+"내 Figma 파일에서 버튼<br/>
+&nbsp;컴포넌트 스타일을 분석해줘"<br/>
+<span class="cmt">"Figma 프레임 구조를 설명해줘"</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- SLIDE 7 — 체크리스트 + 팁 -->
+  <!-- ══════════════════════════════════════════════ -->
+  <section class="slide slide-7" id="slide-6">
+    <div class="content">
+      <div class="step" data-step="1"><span class="label">마무리</span></div>
+      <div class="step" data-step="2"><h2 class="subtitle">✅ 연결 확인 <span class="accent-purple">체크리스트</span></h2></div>
+      <div class="step" data-step="3">
+        <ul class="checklist">
+          <li><div class="check-box" style="border-color:rgba(167,139,250,.5);"></div>🟣 Notion 커넥터 연결 완료</li>
+          <li><div class="check-box" style="border-color:rgba(96,165,250,.5);"></div>🔵 Google Calendar 커넥터 연결 완료</li>
+          <li><div class="check-box" style="border-color:rgba(52,211,153,.5);"></div>🟢 Figma 커넥터 연결 완료</li>
+          <li><div class="check-box" style="border-color:rgba(251,191,36,.5);"></div>⚡ 각 커넥터 테스트 프롬프트 실행해봄</li>
+        </ul>
+      </div>
+      <div class="step" data-step="4">
+        <div class="callout yellow">
+          💡 <strong>팁</strong>: 커넥터가 연결되면 Claude 채팅창 하단에 활성화된 도구 아이콘이 표시됩니다.
+          연결이 끊기면 재인증이 필요할 수 있어요.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- UI -->
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+  <div id="counter">1 / 7</div>
+  <div id="key-hint">
+    <kbd>←</kbd><kbd>→</kbd>&nbsp;이동&nbsp;&nbsp;<kbd>F</kbd>&nbsp;전체화면
+  </div>
+</div>
+
+<script>
+(function () {
+  const SLIDES   = Array.from(document.querySelectorAll('.slide'));
+  const TOTAL    = SLIDES.length;
+  const DURATION = 400;
+  const STAGGER  = 120;
+  let cur = 0, busy = false;
+  let staggerTimers = [];
+
+  const fill    = document.getElementById('progress-fill');
+  const counter = document.getElementById('counter');
+  const hint    = document.getElementById('key-hint');
+
+  /* ── initial hash ── */
+  (function initHash() {
+    const m = location.hash.match(/slide-(\d+)/);
+    if (m) { cur = Math.min(Math.max(parseInt(m[1]) - 1, 0), TOTAL - 1); }
+  })();
+
+  function resetSteps(idx) {
+    SLIDES[idx].querySelectorAll('.step').forEach(s => {
+      s.classList.remove('visible');
+    });
+  }
+
+  function showStaggered(idx) {
+    staggerTimers.forEach(clearTimeout);
+    staggerTimers = [];
+    const steps = Array.from(SLIDES[idx].querySelectorAll('.step'))
+      .sort((a, b) => (+a.dataset.step || 0) - (+b.dataset.step || 0));
+    steps.forEach((el, i) => {
+      const t = setTimeout(() => el.classList.add('visible'), i * STAGGER);
+      staggerTimers.push(t);
+    });
+  }
+
+  function updateUI() {
+    fill.style.width = ((cur + 1) / TOTAL * 100) + '%';
+    counter.textContent = (cur + 1) + ' / ' + TOTAL;
+    history.replaceState(null, '', '#slide-' + (cur + 1));
+  }
+
+  function goTo(idx, instant) {
+    if (idx === cur && !instant) return;
+    if (busy) return;
+    busy = true;
+
+    const prev = cur;
+    const forward = idx > prev;
+    cur = idx;
+
+    const leaving = SLIDES[prev];
+    const entering = SLIDES[cur];
+
+    resetSteps(cur);
+
+    if (instant) {
+      SLIDES.forEach((s, i) => { s.className = 'slide slide-' + (i + 1); });
+      entering.classList.add('active');
+      showStaggered(cur);
+      updateUI();
+      busy = false;
+      return;
+    }
+
+    leaving.classList.add(forward ? 'exit-left' : 'exit-right');
+    entering.classList.add('active');
+
+    const done = () => {
+      leaving.className = 'slide slide-' + (prev + 1);
+      showStaggered(cur);
+      updateUI();
+      busy = false;
+    };
+
+    const onEnd = () => { leaving.removeEventListener('transitionend', onEnd); done(); };
+    leaving.addEventListener('transitionend', onEnd);
+    setTimeout(done, DURATION + 50);
+  }
+
+  /* ── first load ── */
+  SLIDES.forEach((s, i) => { if (i !== cur) resetSteps(i); });
+  SLIDES[cur].classList.add('active');
+  showStaggered(cur);
+  updateUI();
+
+  /* ── keyboard ── */
+  document.addEventListener('keydown', e => {
+    hint.style.opacity = '0';
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+      e.preventDefault(); if (cur < TOTAL - 1) goTo(cur + 1, false);
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault(); if (cur > 0) goTo(cur - 1, false);
+    } else if (e.key === 'Home') { goTo(0, false);
+    } else if (e.key === 'End')  { goTo(TOTAL - 1, false);
+    } else if (e.key === 'f' || e.key === 'F') {
+      document.fullscreenElement
+        ? document.exitFullscreen()
+        : document.documentElement.requestFullscreen();
+    }
+  });
+
+  /* ── touch ── */
+  let tx = 0;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend',   e => {
+    hint.style.opacity = '0';
+    const dx = e.changedTouches[0].clientX - tx;
+    if (dx < -48 && cur < TOTAL - 1) goTo(cur + 1, false);
+    if (dx >  48 && cur > 0)         goTo(cur - 1, false);
+  }, { passive: true });
+
+  /* ── hash change ── */
+  window.addEventListener('hashchange', () => {
+    const m = location.hash.match(/slide-(\d+)/);
+    if (m) goTo(Math.min(Math.max(parseInt(m[1]) - 1, 0), TOTAL - 1), true);
+  });
+})();
+</script>
+</body>
+</html>
