@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="NEXCORE 기술과 서비스 — AI, 클라우드, 빅데이터, 보안"/>
+<title>NEXCORE — 기술과 서비스</title>
+<link rel="stylesheet" href="../css/style.css"/>
+<link rel="stylesheet" href="../css/nav.css"/>
+<style>
+/* ── Tech Card ────────────────────────────────────────────── */
+.tech-card {
+  display:grid; grid-template-columns:80px 1fr;
+  gap:1.5rem; align-items:start;
+  padding:2rem; background:var(--white);
+  border-radius:var(--r-lg); border:1px solid var(--gray-200);
+  margin-bottom:1rem;
+  transition:all .3s var(--ease-out);
+}
+.tech-card:hover { box-shadow:var(--shadow-md); border-color:rgba(0,82,255,.2); transform:translateX(4px); }
+.tech-card__icon {
+  width:64px; height:64px; border-radius:var(--r-md);
+  background:linear-gradient(135deg,var(--navy),var(--blue));
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.75rem; flex-shrink:0;
+}
+.tech-card__label {
+  font-family:var(--font-mono); font-size:.68rem;
+  letter-spacing:.15em; text-transform:uppercase;
+  color:var(--blue); margin-bottom:.4rem; display:block;
+}
+.tech-card__title { font-size:1.1rem; font-weight:700; color:var(--navy); margin-bottom:.5rem; }
+.tech-card__desc  { font-size:.875rem; color:var(--gray-500); line-height:1.75; }
+.tech-card__tags  { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.875rem; }
+.tech-tag {
+  font-family:var(--font-mono); font-size:.7rem;
+  padding:.2rem .6rem; border-radius:4px;
+  background:var(--gray-100); color:var(--gray-500);
+  border:1px solid var(--gray-200);
+}
+
+/* ── Service Card ─────────────────────────────────────────── */
+.svc-card {
+  padding:2rem 1.75rem; background:var(--white);
+  border-radius:var(--r-lg); border:1px solid var(--gray-200);
+  transition:all .3s var(--ease-out); position:relative; overflow:hidden;
+}
+.svc-card::before {
+  content:''; position:absolute; bottom:0; left:0; right:0;
+  height:3px; background:var(--blue);
+  transform:scaleX(0); transform-origin:left;
+  transition:transform .35s var(--ease-out);
+}
+.svc-card:hover { box-shadow:var(--shadow-md); transform:translateY(-4px); }
+.svc-card:hover::before { transform:scaleX(1); }
+.svc-icon {
+  width:52px; height:52px; border-radius:var(--r-md);
+  background:rgba(0,82,255,.08);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.4rem; margin-bottom:1.25rem;
+}
+.svc-num {
+  font-family:var(--font-mono); font-size:.7rem;
+  letter-spacing:.12em; color:var(--gray-500);
+  margin-bottom:.875rem; display:block;
+}
+.svc-title { font-size:1rem; font-weight:700; color:var(--navy); margin-bottom:.65rem; line-height:1.35; }
+.svc-desc  { font-size:.875rem; color:var(--gray-500); line-height:1.75; }
+
+/* ── Numbers Strip ────────────────────────────────────────── */
+.numbers-strip {
+  background:var(--blue); padding:3.5rem 0;
+  display:grid; grid-template-columns:repeat(4,1fr);
+}
+.numbers-item { text-align:center; padding:1rem; border-right:1px solid rgba(255,255,255,.15); }
+.numbers-item:last-child { border:none; }
+.numbers-val {
+  font-family:var(--font-display); font-size:2.8rem;
+  color:var(--white); font-weight:700; line-height:1;
+}
+.numbers-val span { color:rgba(255,255,255,.6); font-size:1.8rem; }
+.numbers-label { font-size:.75rem; color:rgba(255,255,255,.65); letter-spacing:.12em; text-transform:uppercase; margin-top:.5rem; }
+
+@media(max-width:768px){
+  .tech-card { grid-template-columns:1fr }
+  .numbers-strip { grid-template-columns:repeat(2,1fr) }
+  .numbers-item { border-right:none; border-bottom:1px solid rgba(255,255,255,.15) }
+  .numbers-item:nth-child(odd) { border-right:1px solid rgba(255,255,255,.15) }
+}
+</style>
+</head>
+<body>
+
+<div id="nav-slot"></div>
+
+<header class="page-header">
+  <div class="page-header__inner">
+    <div class="page-header__kicker">
+      <span class="page-header__kicker-dot"></span>Technology &amp; Service
+    </div>
+    <h1 class="page-header__title">첨단 기술로<br><em>미래</em>를 설계합니다</h1>
+    <p class="page-header__desc">AI, 클라우드, 빅데이터, 보안 — 4개 핵심 기술 축으로 고객의 디지털 전환을 이끕니다</p>
+  </div>
+</header>
+
+<!-- ── Numbers ────────────────────────────────────────────── -->
+<div class="numbers-strip fi">
+  <div class="numbers-item">
+    <div class="numbers-val" data-target="99" data-suffix=".98%">0%</div>
+    <div class="numbers-label">시스템 가동률</div>
+  </div>
+  <div class="numbers-item">
+    <div class="numbers-val" data-target="48" data-suffix="ms">0ms</div>
+    <div class="numbers-label">평균 응답속도</div>
+  </div>
+  <div class="numbers-item">
+    <div class="numbers-val" data-target="1" data-suffix="M+">0M+</div>
+    <div class="numbers-label">일일 처리 건수</div>
+  </div>
+  <div class="numbers-item">
+    <div class="numbers-val" data-target="200" data-suffix="+">0+</div>
+    <div class="numbers-label">기술 전문 인력</div>
+  </div>
+</div>
+
+<!-- ── Core Technology Tabs ───────────────────────────────── -->
+<section class="section section--white">
+  <div class="container">
+    <div class="sec-row">
+      <div class="fi">
+        <span class="eyebrow">Core Technology</span>
+        <h2 class="sec-title">핵심 기술</h2>
+        <span class="rule"></span>
+        <p class="sec-desc">23년간 축적된 기술력을 4개 핵심 영역에 집중합니다</p>
+      </div>
+    </div>
+    <div class="tabs-wrap fi">
+      <div class="tab-nav">
+        <button class="tab-btn" data-tab="ai">AI · ML</button>
+        <button class="tab-btn" data-tab="cloud">클라우드</button>
+        <button class="tab-btn" data-tab="data">빅데이터</button>
+        <button class="tab-btn" data-tab="security">보안</button>
+      </div>
+      <div data-panel="ai" class="tab-panel">
+        <div class="tech-card">
+          <div class="tech-card__icon">🤖</div>
+          <div>
+            <span class="tech-card__label">Generative AI</span>
+            <div class="tech-card__title">NEXAI — 기업용 Generative AI 플랫폼</div>
+            <p class="tech-card__desc">자체 LLM 파인튜닝 및 RAG 파이프라인으로 기업 전용 AI 어시스턴트를 구축합니다. 사내 문서, ERP, CRM 데이터를 연동해 즉시 활용 가능한 업무 자동화를 실현합니다.</p>
+            <div class="tech-card__tags">
+              <span class="tech-tag">LLM Fine-tuning</span><span class="tech-tag">RAG</span><span class="tech-tag">Vector DB</span><span class="tech-tag">Prompt Engineering</span>
+            </div>
+          </div>
+        </div>
+        <div class="tech-card">
+          <div class="tech-card__icon">🧠</div>
+          <div>
+            <span class="tech-card__label">ML Platform</span>
+            <div class="tech-card__title">이미지 인식 · NLP · 예측 모델링</div>
+            <p class="tech-card__desc">컴퓨터 비전, 자연어처리, 시계열 예측 등 다양한 ML 모델을 하나의 MLOps 플랫폼에서 개발·배포·모니터링할 수 있습니다.</p>
+            <div class="tech-card__tags">
+              <span class="tech-tag">TensorFlow</span><span class="tech-tag">PyTorch</span><span class="tech-tag">MLflow</span><span class="tech-tag">Kubeflow</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-panel="cloud" class="tab-panel">
+        <div class="tech-card">
+          <div class="tech-card__icon">☁️</div>
+          <div>
+            <span class="tech-card__label">Hybrid Cloud</span>
+            <div class="tech-card__title">CloudX — 하이브리드 클라우드 오케스트레이션</div>
+            <p class="tech-card__desc">퍼블릭(AWS, Azure, GCP)과 프라이빗 클라우드를 단일 콘솔에서 통합 관리하는 CloudX는 비용 최적화, 보안 컴플라이언스, 자동 스케일링을 한 번에 해결합니다.</p>
+            <div class="tech-card__tags">
+              <span class="tech-tag">Kubernetes</span><span class="tech-tag">Terraform</span><span class="tech-tag">AWS</span><span class="tech-tag">Azure</span><span class="tech-tag">GCP</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-panel="data" class="tab-panel">
+        <div class="tech-card">
+          <div class="tech-card__icon">📊</div>
+          <div>
+            <span class="tech-card__label">Real-time Analytics</span>
+            <div class="tech-card__title">DataStream — 실시간 빅데이터 분석 플랫폼</div>
+            <p class="tech-card__desc">Kafka 기반 스트리밍 수집, Spark 분산 처리, Elasticsearch 검색을 통합한 DataStream으로 초당 100만 건 이상의 이벤트를 실시간 분석합니다.</p>
+            <div class="tech-card__tags">
+              <span class="tech-tag">Apache Kafka</span><span class="tech-tag">Spark</span><span class="tech-tag">Elasticsearch</span><span class="tech-tag">Grafana</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-panel="security" class="tab-panel">
+        <div class="tech-card">
+          <div class="tech-card__icon">🔒</div>
+          <div>
+            <span class="tech-card__label">Zero Trust Security</span>
+            <div class="tech-card__title">SecureX — 통합 Zero Trust 보안 플랫폼</div>
+            <p class="tech-card__desc">모든 접속 요청을 신뢰하지 않는 제로트러스트 원칙 하에 SIEM, EDR, IAM을 통합한 SecureX는 내부·외부 위협으로부터 기업 자산을 24/7 보호합니다.</p>
+            <div class="tech-card__tags">
+              <span class="tech-tag">Zero Trust</span><span class="tech-tag">SIEM</span><span class="tech-tag">EDR</span><span class="tech-tag">IAM</span><span class="tech-tag">SOC</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Services Grid ──────────────────────────────────────── -->
+<section class="section section--cream">
+  <div class="container">
+    <div class="sec-row">
+      <div class="fi">
+        <span class="eyebrow">Services</span>
+        <h2 class="sec-title">서비스</h2>
+        <span class="rule"></span>
+        <p class="sec-desc">고객의 성공을 위해 설계된 전방위 서비스 포트폴리오</p>
+      </div>
+    </div>
+    <div class="grid-3">
+      <div class="svc-card fi">
+        <span class="svc-num">01</span>
+        <div class="svc-icon">🏗️</div>
+        <div class="svc-title">IT 컨설팅</div>
+        <p class="svc-desc">디지털 전환 전략 수립부터 실행 로드맵 설계까지 검증된 방법론으로 변화를 이끕니다.</p>
+      </div>
+      <div class="svc-card fi fi-d1">
+        <span class="svc-num">02</span>
+        <div class="svc-icon">⚙️</div>
+        <div class="svc-title">시스템 통합 (SI)</div>
+        <p class="svc-desc">기업 맞춤형 정보시스템 구축부터 운영까지 전 과정을 책임지는 턴키 SI 서비스를 제공합니다.</p>
+      </div>
+      <div class="svc-card fi fi-d2">
+        <span class="svc-num">03</span>
+        <div class="svc-icon">🔧</div>
+        <div class="svc-title">유지보수 (SM)</div>
+        <p class="svc-desc">24/7 모니터링과 신속한 장애 대응으로 안정적인 IT 운영 환경을 보장합니다.</p>
+      </div>
+      <div class="svc-card fi fi-d1">
+        <span class="svc-num">04</span>
+        <div class="svc-icon">📱</div>
+        <div class="svc-title">모바일 솔루션</div>
+        <p class="svc-desc">iOS·Android 기반 기업용 앱 개발 및 MDM 솔루션으로 모바일 워크플레이스를 구현합니다.</p>
+      </div>
+      <div class="svc-card fi fi-d2">
+        <span class="svc-num">05</span>
+        <div class="svc-icon">🌐</div>
+        <div class="svc-title">디지털 마케팅</div>
+        <p class="svc-desc">데이터 기반 마케팅 자동화와 퍼포먼스 마케팅으로 고객의 비즈니스 성장을 지원합니다.</p>
+      </div>
+      <div class="svc-card fi fi-d3">
+        <span class="svc-num">06</span>
+        <div class="svc-icon">🎓</div>
+        <div class="svc-title">교육 · 트레이닝</div>
+        <p class="svc-desc">임직원 디지털 역량 강화를 위한 맞춤형 교육 프로그램과 기술 인증 과정을 운영합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="footer-slot"></div>
+
+<script src="../js/components.js"></script>
+<script src="../js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  App.initTabs('.tabs-wrap');
+});
+</script>
+</body>
+</html>

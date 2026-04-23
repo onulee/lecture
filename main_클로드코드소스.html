@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="기술과 신뢰를 바탕으로 더 나은 세상을 만들어가는 기업"/>
+<title>NEXCORE — 메인</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ─── RESET & ROOT ─────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:#F7F6F2;color:#0D0D0D;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+ul{list-style:none}
+button{cursor:pointer;border:none;background:none;font-family:inherit}
+
+/* ─── VARIABLES ────────────────────────────────────────────── */
+:root{
+  --navy:#060D1A;
+  --blue:#003087;
+  --cream:#F7F6F2;
+  --gold:#C8A23A;
+  --white:#FFFFFF;
+  --gray-100:#F0EFEB;
+  --gray-200:#DDDBD3;
+  --gray-500:#8A8880;
+  --gray-800:#2E2D2B;
+  --nav-h:72px;
+  --ease-out:cubic-bezier(0.16,1,0.3,1);
+  --ease-io:cubic-bezier(0.45,0,0.55,1);
+  --max:1320px;
+  --pad:clamp(1.25rem,4vw,3rem);
+}
+
+/* ─── NAV ──────────────────────────────────────────────────── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:var(--nav-h);display:flex;align-items:center;padding:0 var(--pad);transition:background .4s var(--ease-out),box-shadow .4s}
+.nav.scrolled{background:rgba(6,13,26,.94);backdrop-filter:blur(16px);box-shadow:0 1px 0 rgba(255,255,255,.06)}
+.nav__inner{max-width:var(--max);width:100%;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:2rem}
+.nav__logo{display:flex;align-items:center;gap:.6rem;color:var(--white)}
+.nav__logo-mark{width:34px;height:34px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav__logo-text{font-family:'DM Mono',monospace;font-size:1.05rem;letter-spacing:.18em;font-weight:500}
+.nav__links{display:flex;align-items:center;gap:.25rem}
+.nav__link{position:relative;padding:.45rem .9rem;font-size:.875rem;font-weight:500;color:rgba(255,255,255,.7);letter-spacing:.01em;transition:color .2s}
+.nav__link::after{content:'';position:absolute;bottom:0;left:.9rem;right:.9rem;height:1.5px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .25s var(--ease-out)}
+.nav__link:hover{color:var(--white)}
+.nav__link:hover::after,.nav__link.active::after{transform:scaleX(1)}
+.nav__link.active{color:var(--white)}
+.nav__cta{margin-left:.5rem;padding:.5rem 1.25rem;background:var(--blue);color:var(--white);border-radius:6px;font-size:.875rem;font-weight:700;letter-spacing:.02em;transition:background .2s,transform .2s}
+.nav__cta:hover{background:#003ECC;transform:translateY(-1px)}
+.nav__burger{display:none;flex-direction:column;gap:5px;padding:8px;color:white}
+.nav__burger span{display:block;width:22px;height:1.5px;background:currentColor;transition:transform .3s,opacity .3s}
+.nav__burger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.nav__burger.open span:nth-child(2){opacity:0}
+.nav__burger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+.nav__mobile{display:none;position:fixed;inset:var(--nav-h) 0 0 0;z-index:999;background:rgba(6,13,26,.97);backdrop-filter:blur(20px);flex-direction:column;align-items:center;justify-content:center;gap:2rem}
+.nav__mobile.open{display:flex}
+.nav__mobile .nav__link{font-size:1.4rem;color:rgba(255,255,255,.6)}
+
+/* ─── HERO ─────────────────────────────────────────────────── */
+.hero{position:relative;height:100svh;min-height:600px;background:var(--navy);overflow:hidden}
+.hero__bg-pattern{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:72px 72px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%)}
+.hero__glow{position:absolute;border-radius:50%;filter:blur(120px);pointer-events:none}
+.hero__glow--1{width:600px;height:600px;background:rgba(0,82,255,.18);top:-100px;right:-100px}
+.hero__glow--2{width:400px;height:400px;background:rgba(200,162,58,.1);bottom:0;left:-100px}
+.hero__slider{position:relative;height:100%;z-index:1}
+.hero__slide{position:absolute;inset:0;display:flex;align-items:center;padding:0 var(--pad);opacity:0;pointer-events:none;transition:opacity .8s var(--ease-io)}
+.hero__slide.active{opacity:1;pointer-events:auto}
+.hero__slide-inner{max-width:var(--max);width:100%;margin:0 auto;padding-top:var(--nav-h)}
+.hero__kicker{display:inline-flex;align-items:center;gap:.5rem;font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:1.5rem}
+.hero__kicker-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s ease infinite}
+.hero__title{font-family:'Playfair Display',serif;font-size:clamp(2.8rem,7vw,6.5rem);line-height:1.0;color:var(--white);font-weight:900;letter-spacing:-.01em;margin-bottom:1.5rem}
+.hero__title em{color:var(--gold);font-style:normal}
+.hero__desc{font-size:clamp(1rem,1.5vw,1.2rem);color:rgba(255,255,255,.6);line-height:1.75;max-width:520px;font-weight:300;margin-bottom:2.5rem}
+.hero__actions{display:flex;gap:1rem;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 1.75rem;border-radius:6px;font-size:.9rem;font-weight:700;letter-spacing:.02em;transition:all .2s var(--ease-out)}
+.btn--primary{background:var(--blue);color:var(--white)}
+.btn--primary:hover{background:#003ECC;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,82,255,.4)}
+.btn--ghost{border:1.5px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8)}
+.btn--ghost:hover{border-color:rgba(255,255,255,.6);color:var(--white);background:rgba(255,255,255,.05)}
+.btn--outline{border:1.5px solid var(--gray-200);color:var(--gray-800)}
+.btn--outline:hover{border-color:var(--blue);color:var(--blue)}
+.hero__dots{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;gap:.75rem;z-index:2}
+.hero__dot{width:32px;height:3px;border-radius:2px;background:rgba(255,255,255,.25);cursor:pointer;transition:background .3s,width .3s var(--ease-out)}
+.hero__dot.active{background:var(--gold);width:48px}
+.hero__nav{position:absolute;bottom:2.1rem;right:var(--pad);display:flex;gap:.5rem;z-index:2}
+.hero__arrow{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:1.1rem}
+.hero__arrow:hover{border-color:var(--white);color:var(--white);background:rgba(255,255,255,.06)}
+
+/* ─── TICKER ───────────────────────────────────────────────── */
+.ticker{background:var(--blue);overflow:hidden;padding:.7rem 0;white-space:nowrap}
+.ticker__track{display:inline-flex;gap:3rem;animation:marquee 28s linear infinite}
+.ticker__item{font-family:'DM Mono',monospace;font-size:.78rem;color:rgba(255,255,255,.85);letter-spacing:.06em;display:flex;align-items:center;gap:.5rem}
+.ticker__sep{color:rgba(255,255,255,.35)}
+.ticker__val{color:var(--white);font-weight:500}
+.ticker__up{color:#5EEA9D}
+.ticker__dn{color:#FF7D7D}
+
+/* ─── STATS ────────────────────────────────────────────────── */
+.stats{background:var(--navy);padding:4rem 0}
+.stats__grid{max-width:var(--max);margin:0 auto;padding:0 var(--pad);display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
+.stats__item{padding:2rem 1.5rem;text-align:center;border-right:1px solid rgba(255,255,255,.07)}
+.stats__item:last-child{border:none}
+.stats__num{font-family:'Playfair Display',serif;font-size:clamp(2rem,3.5vw,3rem);color:var(--white);font-weight:700;letter-spacing:-.01em;line-height:1}
+.stats__num span{color:var(--gold)}
+.stats__label{font-size:.78rem;color:rgba(255,255,255,.4);letter-spacing:.12em;text-transform:uppercase;margin-top:.6rem;font-weight:500}
+
+/* ─── SECTION COMMONS ──────────────────────────────────────── */
+.section{padding:clamp(4rem,8vw,8rem) 0}
+.container{max-width:var(--max);margin:0 auto;padding:0 var(--pad)}
+.eyebrow{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--blue);margin-bottom:.875rem}
+.sec-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,3.5vw,3.2rem);font-weight:900;line-height:1.1;letter-spacing:-.01em;color:var(--navy)}
+.rule{display:block;width:40px;height:3px;background:var(--gold);border-radius:2px;margin:1.25rem 0 1.5rem}
+.sec-desc{font-size:1rem;color:var(--gray-500);line-height:1.8;max-width:520px}
+.sec-row{display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;margin-bottom:3.5rem;flex-wrap:wrap}
+
+/* ─── SERVICES ─────────────────────────────────────────────── */
+.services{background:var(--cream)}
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;background:var(--gray-200);border:1.5px solid var(--gray-200);border-radius:16px;overflow:hidden}
+.svc-card{background:var(--white);padding:2.5rem 2rem;position:relative;overflow:hidden;transition:background .3s}
+.svc-card::before{content:'';position:absolute;inset:0;background:var(--blue);transform:translateY(100%);transition:transform .4s var(--ease-out);z-index:0}
+.svc-card:hover::before{transform:translateY(0)}
+.svc-num{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.12em;color:var(--gray-500);margin-bottom:1rem;position:relative;z-index:1;transition:color .3s}
+.svc-icon{font-size:1.5rem;margin-bottom:1.25rem;width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:var(--gray-100);border-radius:12px;position:relative;z-index:1;transition:background .3s}
+.svc-title{font-size:1.1rem;font-weight:700;color:var(--navy);margin-bottom:.75rem;line-height:1.35;position:relative;z-index:1;transition:color .3s}
+.svc-desc{font-size:.875rem;color:var(--gray-500);line-height:1.75;position:relative;z-index:1;transition:color .3s}
+.svc-link{display:inline-flex;align-items:center;gap:.35rem;margin-top:1.5rem;font-size:.8rem;font-weight:700;color:var(--blue);letter-spacing:.05em;text-transform:uppercase;position:relative;z-index:1;transition:color .3s}
+.svc-card:hover .svc-num,.svc-card:hover .svc-title,.svc-card:hover .svc-desc,.svc-card:hover .svc-link{color:rgba(255,255,255,.85)}
+.svc-card:hover .svc-icon{background:rgba(255,255,255,.15)}
+.svc-card:hover .svc-link{color:var(--white)}
+
+/* ─── TECH ─────────────────────────────────────────────────── */
+.tech{background:var(--navy)}
+.tech .eyebrow{color:var(--gold)}
+.tech .sec-title{color:var(--white)}
+.tech-layout{display:grid;grid-template-columns:1fr 1.1fr;gap:5rem;align-items:center}
+.tech-feature{padding:1.4rem;border:1px solid rgba(255,255,255,.07);border-radius:12px;margin-bottom:.75rem;cursor:pointer;transition:all .3s;display:flex;gap:1.25rem;align-items:flex-start}
+.tech-feature:hover,.tech-feature.active{border-color:rgba(0,82,255,.45);background:rgba(0,82,255,.07)}
+.tech-feature__num{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--gold);letter-spacing:.1em;margin-top:.15rem;flex-shrink:0}
+.tech-feature__title{font-size:.95rem;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:.3rem;transition:color .3s}
+.tech-feature__desc{font-size:.83rem;color:rgba(255,255,255,.3);line-height:1.7;transition:color .3s}
+.tech-feature.active .tech-feature__title{color:var(--white)}
+.tech-feature.active .tech-feature__desc{color:rgba(255,255,255,.55)}
+.tech-visual{aspect-ratio:1;border-radius:24px;background:linear-gradient(135deg,#0D1A3A 0%,#0A2070 100%);border:1px solid rgba(0,82,255,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:3rem;position:relative;overflow:hidden}
+.tech-visual::before{content:'';position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(0,82,255,.25),transparent 70%);animation:float 6s ease-in-out infinite}
+.tv-label{font-family:'DM Mono',monospace;font-size:.7rem;color:rgba(255,255,255,.35);letter-spacing:.15em;text-align:center;position:relative;z-index:1}
+.tv-metric{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:900;color:var(--white);letter-spacing:-.02em;position:relative;z-index:1;text-align:center;line-height:1}
+.tv-metric span{color:var(--gold);font-size:2rem}
+.tv-sub{font-size:.8rem;color:rgba(255,255,255,.4);position:relative;z-index:1;text-align:center}
+.tv-divider{width:100%;height:1px;background:rgba(255,255,255,.06);margin:.5rem 0;position:relative;z-index:1}
+.tv-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;width:100%;position:relative;z-index:1}
+.tv-mini{text-align:center}
+.tv-mini-val{font-family:'Playfair Display',serif;font-size:1.7rem;color:white;font-weight:700;line-height:1}
+.tv-mini-val span{color:var(--gold);font-size:1.1rem}
+.tv-mini-label{font-size:.7rem;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;margin-top:.3rem}
+
+/* ─── ESG ──────────────────────────────────────────────────── */
+.esg{background:var(--cream)}
+.esg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.esg-card{border-radius:16px;padding:2.5rem 2rem;position:relative;overflow:hidden;color:white;transition:transform .3s var(--ease-out),box-shadow .3s}
+.esg-card:hover{transform:translateY(-6px);box-shadow:0 20px 48px rgba(0,0,0,.14)}
+.esg-card--e{background:linear-gradient(145deg,#0B4D30,#0F7A4A)}
+.esg-card--s{background:linear-gradient(145deg,#0A2570,#003087)}
+.esg-card--g{background:linear-gradient(145deg,#3B1A5A,#6B3FA0)}
+.esg-big{font-family:'Playfair Display',serif;font-size:6rem;font-weight:900;opacity:.1;position:absolute;bottom:-1.25rem;right:.75rem;line-height:1;pointer-events:none;letter-spacing:-.02em}
+.esg-tag{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;opacity:.6;margin-bottom:.75rem;display:block}
+.esg-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;margin-bottom:1rem}
+.esg-desc{font-size:.875rem;opacity:.72;line-height:1.75}
+.esg-targets{margin-top:1.5rem;display:flex;flex-direction:column;gap:.4rem}
+.esg-target{display:flex;justify-content:space-between;align-items:center;font-size:.8rem;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.1)}
+.esg-target:last-child{border:none}
+.esg-target-year{font-family:'DM Mono',monospace;font-weight:500;opacity:.85}
+.esg-target-desc{opacity:.6}
+
+/* ─── NEWS ─────────────────────────────────────────────────── */
+.news{background:var(--white)}
+.news-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem}
+.news-stack{display:flex;flex-direction:column;gap:1.5rem}
+.news-card{border-radius:14px;overflow:hidden;border:1px solid var(--gray-200);transition:all .3s var(--ease-out);display:flex;flex-direction:column}
+.news-card:hover{box-shadow:0 12px 36px rgba(0,0,0,.09);transform:translateY(-4px);border-color:transparent}
+.news-thumb{height:200px;background:var(--navy);position:relative;overflow:hidden;flex-shrink:0}
+.news-thumb--sm{height:130px}
+.news-thumb-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:5rem;font-weight:900;opacity:.1;color:white;letter-spacing:.05em}
+.news-thumb-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(6,13,26,.65) 100%)}
+.news-cat{position:absolute;top:1rem;left:1rem;display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:.25rem .65rem;border-radius:4px}
+.cat--notice{background:rgba(200,162,58,.18);color:#C8A23A}
+.cat--press{background:rgba(0,82,255,.15);color:#3375FF}
+.cat--esg{background:rgba(16,110,64,.15);color:#0F6E40}
+.cat--ir{background:rgba(107,63,160,.15);color:#8B5CF6}
+.news-body{padding:1.5rem;flex:1;display:flex;flex-direction:column}
+.news-title{font-size:.975rem;font-weight:700;line-height:1.45;color:var(--navy);margin-bottom:.5rem;flex:1}
+.news-card--feat .news-title{font-size:1.15rem}
+.news-excerpt{font-size:.83rem;color:var(--gray-500);line-height:1.65;margin-bottom:1rem}
+.news-footer{display:flex;justify-content:space-between;align-items:center;padding-top:.75rem;border-top:1px solid var(--gray-100);margin-top:auto}
+.news-date{font-size:.78rem;color:var(--gray-500);font-family:'DM Mono',monospace}
+.news-more{font-size:.78rem;font-weight:700;color:var(--blue);letter-spacing:.04em}
+
+/* ─── IR ───────────────────────────────────────────────────── */
+.ir{background:var(--navy)}
+.ir .eyebrow{color:var(--gold)}
+.ir .sec-title{color:var(--white)}
+.ir-grid{display:grid;grid-template-columns:1fr 1.6fr;gap:5rem;align-items:start}
+.ir-stock{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:2rem}
+.ir-stock-ticker{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.15em;color:rgba(255,255,255,.4);margin-bottom:.5rem}
+.ir-stock-price{font-family:'Playfair Display',serif;font-size:clamp(2rem,3vw,3rem);color:var(--white);font-weight:700;margin-bottom:.35rem;letter-spacing:-.01em}
+.ir-stock-chg{font-size:.95rem;font-weight:700;color:#5EEA9D;margin-bottom:1.75rem}
+.ir-row{display:flex;justify-content:space-between;padding:.65rem 0;font-size:.83rem;border-top:1px solid rgba(255,255,255,.06)}
+.ir-row-label{color:rgba(255,255,255,.4)}
+.ir-row-val{color:rgba(255,255,255,.85);font-weight:500}
+.ir-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
+.ir-kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:1.25rem;text-align:center}
+.ir-kpi-label{font-size:.7rem;color:rgba(255,255,255,.35);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem}
+.ir-kpi-val{font-family:'Playfair Display',serif;font-size:1.6rem;color:white;font-weight:700;line-height:1}
+.ir-kpi-val span{color:var(--gold);font-size:1rem}
+.ir-docs{display:flex;flex-direction:column;gap:.6rem}
+.ir-doc{display:flex;align-items:center;gap:1rem;padding:1.1rem 1.25rem;border-radius:10px;border:1px solid rgba(255,255,255,.07);transition:all .25s;cursor:pointer}
+.ir-doc:hover{border-color:rgba(0,82,255,.4);background:rgba(0,82,255,.06)}
+.ir-doc-icon{width:38px;height:38px;border-radius:8px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem}
+.ir-doc-info{flex:1}
+.ir-doc-title{font-size:.875rem;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:.2rem}
+.ir-doc-date{font-size:.75rem;color:rgba(255,255,255,.3);font-family:'DM Mono',monospace}
+.ir-doc-btn{font-size:.7rem;font-weight:700;color:var(--blue);letter-spacing:.08em;text-transform:uppercase;padding:.3rem .7rem;border:1px solid rgba(0,82,255,.3);border-radius:5px;flex-shrink:0;transition:all .2s}
+.ir-doc:hover .ir-doc-btn{background:var(--blue);color:var(--white);border-color:var(--blue)}
+
+/* ─── CTA ──────────────────────────────────────────────────── */
+.cta-section{background:var(--blue);padding:5.5rem 0;text-align:center}
+.cta-eyebrow{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:1rem}
+.cta-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3.5rem);color:white;font-weight:900;line-height:1.1;margin-bottom:1.25rem}
+.cta-desc{color:rgba(255,255,255,.6);font-size:1rem;line-height:1.75;margin-bottom:2.5rem;max-width:440px;margin-left:auto;margin-right:auto}
+.cta-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.btn--white{background:white;color:var(--blue);border-radius:6px;padding:.875rem 2rem;font-size:.9rem;font-weight:700;transition:background .2s}
+.btn--white:hover{background:#F0EFEB}
+.btn--ghost-white{border:1.5px solid rgba(255,255,255,.35);color:white;border-radius:6px;padding:.875rem 2rem;font-size:.9rem;font-weight:700;transition:all .2s}
+.btn--ghost-white:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.7)}
+
+/* ─── FOOTER ───────────────────────────────────────────────── */
+.footer{background:#03070F;padding:4rem 0 2rem}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;padding-bottom:3rem;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:2rem}
+.footer-logo{display:flex;align-items:center;gap:.6rem;margin-bottom:1.25rem}
+.footer-logo-mark{width:30px;height:30px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.footer-logo-name{font-family:'DM Mono',monospace;font-size:1rem;letter-spacing:.18em;color:var(--white)}
+.footer-brand-desc{font-size:.85rem;color:rgba(255,255,255,.35);line-height:1.8;max-width:280px}
+.footer-socials{display:flex;gap:.75rem;margin-top:1.5rem}
+.footer-social{width:34px;height:34px;border:1px solid rgba(255,255,255,.12);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.82rem;color:rgba(255,255,255,.4);transition:all .2s;cursor:pointer}
+.footer-social:hover{border-color:rgba(255,255,255,.4);color:white}
+.footer-col-title{font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:1.25rem}
+.footer-links{display:flex;flex-direction:column;gap:.6rem}
+.footer-links a{font-size:.85rem;color:rgba(255,255,255,.35);transition:color .2s}
+.footer-links a:hover{color:var(--white)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;font-size:.78rem;color:rgba(255,255,255,.22)}
+.footer-bottom-links{display:flex;gap:1.5rem}
+.footer-bottom-links a:hover{color:rgba(255,255,255,.6)}
+
+/* ─── SCROLL FADE ──────────────────────────────────────────── */
+.fi{opacity:0;transform:translateY(28px);transition:opacity .7s var(--ease-out),transform .7s var(--ease-out)}
+.fi.vis{opacity:1;transform:none}
+.fi-d1{transition-delay:.1s}
+.fi-d2{transition-delay:.2s}
+.fi-d3{transition-delay:.3s}
+.fi-d4{transition-delay:.4s}
+
+/* ─── KEYFRAMES ────────────────────────────────────────────── */
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+
+/* ─── RESPONSIVE ───────────────────────────────────────────── */
+@media(max-width:1100px){.tech-layout{gap:3rem}.ir-grid{gap:3rem}}
+@media(max-width:960px){
+  .svc-grid{grid-template-columns:repeat(2,1fr)}
+  .tech-layout{grid-template-columns:1fr}
+  .tech-visual{display:none}
+  .esg-grid{grid-template-columns:1fr}
+  .news-grid{grid-template-columns:1fr}
+  .ir-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:2rem}
+  .stats__grid{grid-template-columns:repeat(2,1fr)}
+  .stats__item{border-right:none;border-bottom:1px solid rgba(255,255,255,.07)}
+  .stats__item:nth-child(odd){border-right:1px solid rgba(255,255,255,.07)}
+}
+@media(max-width:640px){
+  .nav__links,.nav__cta{display:none}
+  .nav__burger{display:flex}
+  .svc-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr}
+  .sec-row{flex-direction:column;align-items:flex-start;gap:1rem}
+  .ir-kpis{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ NAV ═══════════ -->
+<nav class="nav" id="mainNav">
+  <div class="nav__inner">
+    <a href="#" class="nav__logo">
+      <div class="nav__logo-mark">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="white">
+          <rect x="0" y="0" width="8" height="8" rx="1.5"/>
+          <rect x="10" y="0" width="8" height="8" rx="1.5" opacity=".6"/>
+          <rect x="0" y="10" width="8" height="8" rx="1.5" opacity=".6"/>
+          <rect x="10" y="10" width="8" height="8" rx="1.5" opacity=".25"/>
+        </svg>
+      </div>
+      <span class="nav__logo-text">NEXCORE</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="#about"  class="nav__link">소개</a></li>
+      <li><a href="#tech"   class="nav__link">기술과서비스</a></li>
+      <li><a href="#esg"    class="nav__link">약속과책임</a></li>
+      <li><a href="#news"   class="nav__link">소식</a></li>
+      <li><a href="#ir"     class="nav__link">투자정보</a></li>
+    </ul>
+    <a href="#contact" class="nav__cta">문의하기</a>
+    <button class="nav__burger" id="burger" aria-label="메뉴">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="nav__mobile" id="mobileMenu">
+  <a href="#about"  class="nav__link" onclick="closeMobile()">소개</a>
+  <a href="#tech"   class="nav__link" onclick="closeMobile()">기술과서비스</a>
+  <a href="#esg"    class="nav__link" onclick="closeMobile()">약속과책임</a>
+  <a href="#news"   class="nav__link" onclick="closeMobile()">소식</a>
+  <a href="#ir"     class="nav__link" onclick="closeMobile()">투자정보</a>
+  <a href="#contact" class="btn btn--primary" style="margin-top:.5rem" onclick="closeMobile()">문의하기</a>
+</div>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero" id="hero">
+  <div class="hero__bg-pattern"></div>
+  <div class="hero__glow hero__glow--1"></div>
+  <div class="hero__glow hero__glow--2"></div>
+  <div class="hero__slider">
+    <div class="hero__slide active">
+      <div class="hero__slide-inner">
+        <div class="hero__kicker"><span class="hero__kicker-dot"></span>Innovation — Since 1999</div>
+        <h1 class="hero__title">BUILDING A<br>WORLD <em>WORTH</em><br>TRUSTING</h1>
+        <p class="hero__desc">기술과 신뢰를 바탕으로 더 나은 세상을 만들어가는 기업입니다. 지속가능한 미래를 위해 끊임없이 도전합니다.</p>
+        <div class="hero__actions">
+          <a href="#about" class="btn btn--primary">회사 소개 →</a>
+          <a href="#tech" class="btn btn--ghost">기술 살펴보기</a>
+        </div>
+      </div>
+    </div>
+    <div class="hero__slide">
+      <div class="hero__slide-inner">
+        <div class="hero__kicker"><span class="hero__kicker-dot"></span>Technology &amp; Service</div>
+        <h1 class="hero__title">POWERING<br>THE <em>DIGITAL</em><br>FRONTIER</h1>
+        <p class="hero__desc">AI, 클라우드, 빅데이터 등 첨단 기술로 고객의 디지털 전환을 선도합니다. 복잡한 문제를 단순하게, 불가능을 가능하게.</p>
+        <div class="hero__actions">
+          <a href="#tech" class="btn btn--primary">기술 알아보기 →</a>
+          <a href="#contact" class="btn btn--ghost">파트너십 문의</a>
+        </div>
+      </div>
+    </div>
+    <div class="hero__slide">
+      <div class="hero__slide-inner">
+        <div class="hero__kicker"><span class="hero__kicker-dot"></span>ESG — Carbon Neutral 2040</div>
+        <h1 class="hero__title">COMMITTED<br>TO A <em>GREENER</em><br>TOMORROW</h1>
+        <p class="hero__desc">환경·사회·지배구조를 아우르는 ESG 경영을 실천합니다. 2040년 탄소중립 달성을 향해 오늘도 나아갑니다.</p>
+        <div class="hero__actions">
+          <a href="#esg" class="btn btn--primary">ESG 현황 →</a>
+          <a href="#ir" class="btn btn--ghost">투자정보</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero__dots">
+    <button class="hero__dot active" onclick="goSlide(0)"></button>
+    <button class="hero__dot" onclick="goSlide(1)"></button>
+    <button class="hero__dot" onclick="goSlide(2)"></button>
+  </div>
+  <div class="hero__nav">
+    <button class="hero__arrow" onclick="prevSlide()">←</button>
+    <button class="hero__arrow" onclick="nextSlide()">→</button>
+  </div>
+</section>
+
+<!-- ═══════════ TICKER ═══════════ -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker__track">
+    <span class="ticker__item">KOSPI <span class="ticker__val">2,782.45</span> <span class="ticker__up">▲ 0.34%</span></span>
+    <span class="ticker__sep">·</span>
+    <span class="ticker__item">NEXCORE <span class="ticker__val">48,500</span> <span class="ticker__up">▲ 2.54%</span></span>
+    <span class="ticker__sep">·</span>
+    <span class="ticker__item">매출 YoY <span class="ticker__val">+23%</span></span>
+    <span class="ticker__sep">·</span>
+    <span class="ticker__item">글로벌 파트너 <span class="ticker__val">48개국</span></span>
+    <span class="ticker__sep">·</span>
+    <span class="ticker__item">ESG 등급 <span class="ticker__val">AA</span></span>
+    <span class="ticker__sep">·</span>
+    <span class="ticker__item">임직원 <span class="ticker__val">1,200+</span></span>
+    <span class="ticker__sep">·</span>
+    <span class="ticker__item">KOSPI <span class="ticker__val">2,782.45</span> <span class="ticker__up">▲ 0.34%</span></span>
+    <span class="ticker__sep">·</span>
+    <span class="ticker__item">NEXCORE <span class="ticker__val">48,500</span> <span class="ticker__up">▲ 2.54%</span></span>
+    <span class="ticker__sep">·</span>
+    <span class="ticker__item">매출 YoY <span class="ticker__val">+23%</span></span>
+    <span class="ticker__sep">·</span>
+    <span class="ticker__item">글로벌 파트너 <span class="ticker__val">48개국</span></span>
+    <span class="ticker__sep">·</span>
+    <span class="ticker__item">ESG 등급 <span class="ticker__val">AA</span></span>
+    <span class="ticker__sep">·</span>
+    <span class="ticker__item">임직원 <span class="ticker__val">1,200+</span></span>
+  </div>
+</div>
+
+<!-- ═══════════ STATS ═══════════ -->
+<section class="stats" id="about">
+  <div class="stats__grid">
+    <div class="stats__item fi">
+      <div class="stats__num" data-target="23" data-suffix="년">0<span>년</span></div>
+      <div class="stats__label">업력</div>
+    </div>
+    <div class="stats__item fi fi-d1">
+      <div class="stats__num" data-target="1200" data-suffix="+">0<span>+</span></div>
+      <div class="stats__label">임직원</div>
+    </div>
+    <div class="stats__item fi fi-d2">
+      <div class="stats__num" data-target="48" data-suffix="개">0<span>개</span></div>
+      <div class="stats__label">글로벌 파트너</div>
+    </div>
+    <div class="stats__item fi fi-d3">
+      <div class="stats__num" data-target="99" data-suffix="%">0<span>%</span></div>
+      <div class="stats__label">고객 만족도</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SERVICES ═══════════ -->
+<section class="section services">
+  <div class="container">
+    <div class="sec-row">
+      <div class="fi">
+        <div class="eyebrow">Services</div>
+        <h2 class="sec-title">핵심 서비스</h2>
+        <span class="rule"></span>
+        <p class="sec-desc">고객의 성공을 위해 설계된 차별화된 서비스 포트폴리오</p>
+      </div>
+      <a href="pages/tech.html" class="btn btn--outline fi fi-d2">전체 서비스 →</a>
+    </div>
+    <div class="svc-grid">
+      <div class="svc-card fi">
+        <div class="svc-num">01</div>
+        <div class="svc-icon">🤖</div>
+        <h3 class="svc-title">AI · 머신러닝 솔루션</h3>
+        <p class="svc-desc">자체 ML 플랫폼 기반의 이미지 인식, NLP, 예측 모델링 등 엔터프라이즈급 AI 서비스</p>
+        <span class="svc-link">자세히 보기 →</span>
+      </div>
+      <div class="svc-card fi fi-d1">
+        <div class="svc-num">02</div>
+        <div class="svc-icon">☁️</div>
+        <h3 class="svc-title">하이브리드 클라우드</h3>
+        <p class="svc-desc">퍼블릭·프라이빗 클라우드를 통합 관리하는 CloudX 플랫폼으로 비용 효율과 보안 동시 확보</p>
+        <span class="svc-link">자세히 보기 →</span>
+      </div>
+      <div class="svc-card fi fi-d2">
+        <div class="svc-num">03</div>
+        <div class="svc-icon">📊</div>
+        <h3 class="svc-title">빅데이터 분석</h3>
+        <p class="svc-desc">실시간 데이터 파이프라인과 시각화 툴로 숨겨진 인사이트를 발굴하고 의사결정 속도 향상</p>
+        <span class="svc-link">자세히 보기 →</span>
+      </div>
+      <div class="svc-card fi fi-d1">
+        <div class="svc-num">04</div>
+        <div class="svc-icon">🔒</div>
+        <h3 class="svc-title">Zero Trust 보안</h3>
+        <p class="svc-desc">제로트러스트 아키텍처 기반 통합 보안 플랫폼으로 사이버 위협 대응 및 기업 자산 보호</p>
+        <span class="svc-link">자세히 보기 →</span>
+      </div>
+      <div class="svc-card fi fi-d2">
+        <div class="svc-num">05</div>
+        <div class="svc-icon">⚙️</div>
+        <h3 class="svc-title">시스템 통합 (SI)</h3>
+        <p class="svc-desc">기업 맞춤형 정보시스템 구축부터 운영까지 전 과정을 책임지는 턴키 SI 서비스</p>
+        <span class="svc-link">자세히 보기 →</span>
+      </div>
+      <div class="svc-card fi fi-d3">
+        <div class="svc-num">06</div>
+        <div class="svc-icon">🌐</div>
+        <h3 class="svc-title">IT 컨설팅</h3>
+        <p class="svc-desc">디지털 전환 전략 수립부터 실행 로드맵까지 검증된 방법론으로 변화를 선도</p>
+        <span class="svc-link">자세히 보기 →</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ TECH ═══════════ -->
+<section class="section tech" id="tech">
+  <div class="container">
+    <div class="tech-layout">
+      <div>
+        <div class="eyebrow fi">Technology</div>
+        <h2 class="sec-title fi fi-d1">기술이 만드는<br>새로운 가능성</h2>
+        <span class="rule fi fi-d1"></span>
+        <p class="fi fi-d2" style="color:rgba(255,255,255,.45);font-size:1rem;line-height:1.8;max-width:480px">23년간 축적된 기술력을 바탕으로 AI 시대를 선도합니다</p>
+        <div style="margin-top:2.5rem">
+          <div class="tech-feature active fi fi-d1">
+            <div class="tech-feature__num">01</div>
+            <div>
+              <div class="tech-feature__title">Generative AI 엔진</div>
+              <div class="tech-feature__desc">자체 LLM 파인튜닝 및 RAG 파이프라인으로 기업 전용 AI 어시스턴트를 구축합니다.</div>
+            </div>
+          </div>
+          <div class="tech-feature fi fi-d2">
+            <div class="tech-feature__num">02</div>
+            <div>
+              <div class="tech-feature__title">Real-time Data Platform</div>
+              <div class="tech-feature__desc">Kafka + Spark 기반 스트리밍 아키텍처로 초당 100만 건 이상의 이벤트를 처리합니다.</div>
+            </div>
+          </div>
+          <div class="tech-feature fi fi-d3">
+            <div class="tech-feature__num">03</div>
+            <div>
+              <div class="tech-feature__title">Cloud-native Security</div>
+              <div class="tech-feature__desc">SIEM·EDR·제로트러스트 아키텍처가 통합된 차세대 보안 플랫폼을 운영합니다.</div>
+            </div>
+          </div>
+          <div class="tech-feature fi fi-d4">
+            <div class="tech-feature__num">04</div>
+            <div>
+              <div class="tech-feature__title">Hybrid Cloud Orchestration</div>
+              <div class="tech-feature__desc">멀티클라우드 환경의 비용·성능·보안을 단일 콘솔에서 통합 관리합니다.</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:2.5rem" class="fi fi-d2">
+          <a href="pages/tech.html" class="btn btn--primary">기술 전체 보기 →</a>
+        </div>
+      </div>
+      <div class="tech-visual fi fi-d2">
+        <div class="tv-label">GLOBAL UPTIME</div>
+        <div class="tv-metric">99.98<span>%</span></div>
+        <div class="tv-sub">지난 12개월 평균 가동률</div>
+        <div class="tv-divider"></div>
+        <div class="tv-mini-grid">
+          <div class="tv-mini">
+            <div class="tv-mini-val">48<span>ms</span></div>
+            <div class="tv-mini-label">평균 응답속도</div>
+          </div>
+          <div class="tv-mini">
+            <div class="tv-mini-val">1M<span>+</span></div>
+            <div class="tv-mini-label">일일 처리 건수</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ ESG ═══════════ -->
+<section class="section esg" id="esg">
+  <div class="container">
+    <div class="sec-row">
+      <div class="fi">
+        <div class="eyebrow">ESG</div>
+        <h2 class="sec-title">약속과 책임</h2>
+        <span class="rule"></span>
+        <p class="sec-desc">환경·사회·지배구조를 아우르는 지속가능한 경영</p>
+      </div>
+      <a href="pages/esg.html" class="btn btn--outline fi fi-d2">ESG 리포트 →</a>
+    </div>
+    <div class="esg-grid">
+      <div class="esg-card esg-card--e fi">
+        <div class="esg-big">E</div>
+        <span class="esg-tag">Environmental</span>
+        <div class="esg-title">환경</div>
+        <p class="esg-desc">재생에너지 전환, 탄소배출 감축을 통해 지구 환경 보전에 앞장섭니다.</p>
+        <div class="esg-targets">
+          <div class="esg-target"><span class="esg-target-year">2030</span><span class="esg-target-desc">탄소배출 50% 감축</span></div>
+          <div class="esg-target"><span class="esg-target-year">2035</span><span class="esg-target-desc">재생에너지 100% 전환</span></div>
+          <div class="esg-target"><span class="esg-target-year">2040</span><span class="esg-target-desc">탄소중립(Net-Zero) 달성</span></div>
+        </div>
+      </div>
+      <div class="esg-card esg-card--s fi fi-d1">
+        <div class="esg-big">S</div>
+        <span class="esg-tag">Social</span>
+        <div class="esg-title">사회</div>
+        <p class="esg-desc">임직원 복지, 다양성·포용성, 지역사회 기여로 건강한 생태계를 만듭니다.</p>
+        <div class="esg-targets">
+          <div class="esg-target"><span class="esg-target-year">여성임원</span><span class="esg-target-desc">30% 달성 목표</span></div>
+          <div class="esg-target"><span class="esg-target-year">봉사</span><span class="esg-target-desc">연 10,000시간 이상</span></div>
+          <div class="esg-target"><span class="esg-target-year">교육</span><span class="esg-target-desc">청소년 IT 교육 지원</span></div>
+        </div>
+      </div>
+      <div class="esg-card esg-card--g fi fi-d2">
+        <div class="esg-big">G</div>
+        <span class="esg-tag">Governance</span>
+        <div class="esg-title">지배구조</div>
+        <p class="esg-desc">투명한 경영과 책임있는 의사결정 체계로 이해관계자의 신뢰를 구축합니다.</p>
+        <div class="esg-targets">
+          <div class="esg-target"><span class="esg-target-year">이사회</span><span class="esg-target-desc">사외이사 과반 구성</span></div>
+          <div class="esg-target"><span class="esg-target-year">공시</span><span class="esg-target-desc">GRI · TCFD 기준 준수</span></div>
+          <div class="esg-target"><span class="esg-target-year">윤리</span><span class="esg-target-desc">내부신고 제도 운영</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ NEWS ═══════════ -->
+<section class="section news" id="news">
+  <div class="container">
+    <div class="sec-row">
+      <div class="fi">
+        <div class="eyebrow">Latest News</div>
+        <h2 class="sec-title">최신 소식</h2>
+        <span class="rule"></span>
+      </div>
+      <a href="pages/news.html" class="btn btn--outline fi fi-d2">전체 소식 →</a>
+    </div>
+    <div class="news-grid">
+      <div class="news-card news-card--feat fi">
+        <div class="news-thumb" style="background:linear-gradient(145deg,#060D1A,#0A2070)">
+          <div class="news-thumb-bg">AI</div>
+          <div class="news-thumb-overlay"></div>
+          <span class="news-cat cat--press">보도자료</span>
+        </div>
+        <div class="news-body">
+          <h3 class="news-title">글로벌 AI 파트너십 체결 — 미국·독일·일본 3개국 동시 진출 확정</h3>
+          <p class="news-excerpt">실리콘밸리, 베를린, 도쿄에 현지 법인을 설립하고 각국 선도 기업과 전략적 파트너십을 맺어 글로벌 AI 솔루션 시장을 공략합니다.</p>
+          <div class="news-footer">
+            <span class="news-date">2025.07.20</span>
+            <span class="news-more">자세히 보기 →</span>
+          </div>
+        </div>
+      </div>
+      <div class="news-stack">
+        <div class="news-card fi fi-d1">
+          <div class="news-thumb news-thumb--sm" style="background:linear-gradient(145deg,#0B3D20,#0F6E40)">
+            <div class="news-thumb-bg">ESG</div>
+            <div class="news-thumb-overlay"></div>
+            <span class="news-cat cat--esg">ESG</span>
+          </div>
+          <div class="news-body">
+            <h3 class="news-title">탄소중립 2040 선언 및 단계별 실행 로드맵 공개</h3>
+            <div class="news-footer">
+              <span class="news-date">2025.06.10</span>
+              <span class="news-more">자세히 →</span>
+            </div>
+          </div>
+        </div>
+        <div class="news-card fi fi-d2">
+          <div class="news-thumb news-thumb--sm" style="background:linear-gradient(145deg,#2D0A3A,#5C1A80)">
+            <div class="news-thumb-bg">IR</div>
+            <div class="news-thumb-overlay"></div>
+            <span class="news-cat cat--ir">투자정보</span>
+          </div>
+          <div class="news-body">
+            <h3 class="news-title">2025년 1분기 실적 — 매출 2,780억원, YoY +23.6%</h3>
+            <div class="news-footer">
+              <span class="news-date">2025.05.02</span>
+              <span class="news-more">자세히 →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ IR ═══════════ -->
+<section class="section ir" id="ir">
+  <div class="container">
+    <div class="sec-row">
+      <div class="fi">
+        <div class="eyebrow">Investor Relations</div>
+        <h2 class="sec-title">투자정보</h2>
+        <span class="rule" style="background:var(--gold)"></span>
+      </div>
+      <a href="pages/ir.html" class="btn btn--ghost fi fi-d2">IR 전체 보기 →</a>
+    </div>
+    <div class="ir-grid">
+      <div class="fi">
+        <div class="ir-stock">
+          <div class="ir-stock-ticker">NEXCORE · KOSPI 123456</div>
+          <div class="ir-stock-price">48,500</div>
+          <div class="ir-stock-chg">▲ 1,200 (+2.54%)</div>
+          <div class="ir-row"><span class="ir-row-label">시가</span><span class="ir-row-val">47,600</span></div>
+          <div class="ir-row"><span class="ir-row-label">고가 / 저가</span><span class="ir-row-val">49,100 / 47,300</span></div>
+          <div class="ir-row"><span class="ir-row-label">시가총액</span><span class="ir-row-val">5.8조원</span></div>
+          <div class="ir-row"><span class="ir-row-label">52주 최고 / 최저</span><span class="ir-row-val">56,400 / 37,100</span></div>
+          <div class="ir-row"><span class="ir-row-label">기준일</span><span class="ir-row-val" style="color:rgba(255,255,255,.3);font-size:.76rem">2025.07.18</span></div>
+        </div>
+      </div>
+      <div class="fi fi-d1">
+        <div class="ir-kpis">
+          <div class="ir-kpi">
+            <div class="ir-kpi-label">2024 매출</div>
+            <div class="ir-kpi-val">1.0<span>조+</span></div>
+          </div>
+          <div class="ir-kpi">
+            <div class="ir-kpi-label">영업이익률</div>
+            <div class="ir-kpi-val">12<span>%</span></div>
+          </div>
+          <div class="ir-kpi">
+            <div class="ir-kpi-label">YoY 성장</div>
+            <div class="ir-kpi-val" style="color:#5EEA9D">+23<span style="color:#5EEA9D">%</span></div>
+          </div>
+        </div>
+        <div class="ir-docs">
+          <div class="ir-doc"><div class="ir-doc-icon">📋</div><div class="ir-doc-info"><div class="ir-doc-title">2025년 1분기 실적 발표 자료</div><div class="ir-doc-date">2025.05.02</div></div><span class="ir-doc-btn">PDF</span></div>
+          <div class="ir-doc"><div class="ir-doc-icon">📊</div><div class="ir-doc-info"><div class="ir-doc-title">2024 연간보고서 (Annual Report)</div><div class="ir-doc-date">2025.03.28</div></div><span class="ir-doc-btn">PDF</span></div>
+          <div class="ir-doc"><div class="ir-doc-icon">🌱</div><div class="ir-doc-info"><div class="ir-doc-title">2024 ESG 보고서</div><div class="ir-doc-date">2025.03.15</div></div><span class="ir-doc-btn">PDF</span></div>
+          <div class="ir-doc"><div class="ir-doc-icon">🏛️</div><div class="ir-doc-info"><div class="ir-doc-title">2024 사업보고서</div><div class="ir-doc-date">2025.03.31</div></div><span class="ir-doc-btn">PDF</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ CTA ═══════════ -->
+<section class="cta-section" id="contact">
+  <div class="container">
+    <div class="fi">
+      <div class="cta-eyebrow">Get in Touch</div>
+      <h2 class="cta-title">함께 성장할<br>파트너를 찾습니다</h2>
+      <p class="cta-desc">사업 제안, 기술 협력, 투자 문의 어떤 이야기든 환영합니다. 전담 담당자가 24시간 내 답변드립니다.</p>
+      <div class="cta-btns">
+        <a href="mailto:info@nexcore.co.kr" class="btn--white">✉️ 이메일 문의</a>
+        <a href="tel:0212345678" class="btn--ghost-white">📞 02-1234-5678</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">
+          <div class="footer-logo-mark">
+            <svg width="16" height="16" viewBox="0 0 18 18" fill="white"><rect x="0" y="0" width="8" height="8" rx="1.5"/><rect x="10" y="0" width="8" height="8" rx="1.5" opacity=".6"/><rect x="0" y="10" width="8" height="8" rx="1.5" opacity=".6"/><rect x="10" y="10" width="8" height="8" rx="1.5" opacity=".25"/></svg>
+          </div>
+          <span class="footer-logo-name">NEXCORE</span>
+        </div>
+        <p class="footer-brand-desc">기술과 신뢰를 바탕으로 더 나은 세상을 만들어가는 기업입니다. 1999년 설립 이후 23년간 혁신을 선도합니다.</p>
+        <div class="footer-socials">
+          <div class="footer-social">in</div>
+          <div class="footer-social">fb</div>
+          <div class="footer-social">yt</div>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">회사</div>
+        <ul class="footer-links">
+          <li><a href="pages/about.html">소개</a></li>
+          <li><a href="pages/about.html">연혁</a></li>
+          <li><a href="pages/about.html">경영진</a></li>
+          <li><a href="pages/esg.html">약속과책임</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">서비스</div>
+        <ul class="footer-links">
+          <li><a href="pages/tech.html">기술과서비스</a></li>
+          <li><a href="pages/tech.html">AI 솔루션</a></li>
+          <li><a href="pages/tech.html">클라우드</a></li>
+          <li><a href="pages/news.html">소식</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">투자 / 연락처</div>
+        <ul class="footer-links">
+          <li><a href="pages/ir.html">투자정보</a></li>
+          <li><a href="mailto:ir@nexcore.co.kr">ir@nexcore.co.kr</a></li>
+          <li><a href="mailto:info@nexcore.co.kr">info@nexcore.co.kr</a></li>
+          <li><a href="tel:0212345678">02-1234-5678</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 NEXCORE Corporation. All rights reserved.</span>
+      <div class="footer-bottom-links">
+        <a href="#">개인정보처리방침</a>
+        <a href="#">이용약관</a>
+        <a href="#">사이트맵</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════ SCRIPTS ═══════════ -->
+<script>
+/* NAV */
+const nav=document.getElementById('mainNav');
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>20),{passive:true});
+const burger=document.getElementById('burger'),mob=document.getElementById('mobileMenu');
+burger.addEventListener('click',()=>{burger.classList.toggle('open');mob.classList.toggle('open');document.body.style.overflow=mob.classList.contains('open')?'hidden':''});
+function closeMobile(){burger.classList.remove('open');mob.classList.remove('open');document.body.style.overflow=''}
+
+/* HERO SLIDER */
+const slides=document.querySelectorAll('.hero__slide'),dots=document.querySelectorAll('.hero__dot');
+let cur=0,timer;
+function goSlide(n){slides[cur].classList.remove('active');dots[cur].classList.remove('active');cur=(n+slides.length)%slides.length;slides[cur].classList.add('active');dots[cur].classList.add('active');clearInterval(timer);timer=setInterval(nextSlide,5500)}
+function nextSlide(){goSlide(cur+1)}
+function prevSlide(){goSlide(cur-1)}
+timer=setInterval(nextSlide,5500);
+
+/* SCROLL FADE */
+const fiEls=document.querySelectorAll('.fi');
+new IntersectionObserver((entries)=>{
+  entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('vis'),i*60);this.unobserve(e.target)}})
+},{threshold:.08,rootMargin:'0px 0px -30px 0px'}).observe&&fiEls.forEach(el=>{
+  const io2=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){el.classList.add('vis');io2.unobserve(el)}})},{threshold:.08,rootMargin:'0px 0px -30px 0px'});
+  io2.observe(el);
+});
+
+/* COUNTER */
+function animCount(el){
+  const t=parseInt(el.dataset.target),suf=el.dataset.suffix||'',dur=1800,t0=performance.now();
+  const tick=now=>{const p=Math.min((now-t0)/dur,1),e=1-Math.pow(1-p,4);el.innerHTML=Math.round(e*t).toLocaleString()+'<span>'+suf+'</span>';if(p<1)requestAnimationFrame(tick)};
+  requestAnimationFrame(tick);
+}
+document.querySelectorAll('[data-target]').forEach(el=>{
+  new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting){animCount(el);e.target._io.disconnect()}})},{threshold:.5}).observe(el,{_io:null});
+  const io=new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting){animCount(el);io.unobserve(el)}})},{threshold:.5});
+  io.observe(el);
+});
+
+/* TECH FEATURE CLICK */
+document.querySelectorAll('.tech-feature').forEach(f=>{
+  f.addEventListener('click',()=>{document.querySelectorAll('.tech-feature').forEach(x=>x.classList.remove('active'));f.classList.add('active')});
+});
+
+/* SMOOTH ANCHOR */
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{const t=document.querySelector(a.getAttribute('href'));if(t){e.preventDefault();window.scrollTo({top:t.getBoundingClientRect().top+scrollY-72,behavior:'smooth'})}});
+});
+
+/* ACTIVE NAV */
+const navLinks=document.querySelectorAll('.nav__links .nav__link');
+['hero','about','tech','esg','news','ir'].forEach(id=>{
+  const s=document.getElementById(id);if(!s)return;
+  new IntersectionObserver(en=>{en.forEach(e=>{if(e.isIntersecting)navLinks.forEach(l=>l.classList.toggle('active',l.getAttribute('href')==='#'+id))})},{threshold:.35}).observe(s);
+});
+</script>
+</body>
+</html>

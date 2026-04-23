@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="NEXCORE ESG — 환경, 사회, 지배구조 경영"/>
+<title>NEXCORE — 약속과 책임</title>
+<link rel="stylesheet" href="../css/style.css"/>
+<link rel="stylesheet" href="../css/nav.css"/>
+<style>
+/* ── ESG Pillars ──────────────────────────────────────────── */
+.esg-pillar {
+  border-radius:var(--r-xl); padding:2.5rem 2rem;
+  position:relative; overflow:hidden; color:white;
+  transition:transform .3s var(--ease-out), box-shadow .3s;
+}
+.esg-pillar:hover { transform:translateY(-6px); box-shadow:0 24px 56px rgba(0,0,0,.18); }
+.esg-pillar--e { background:linear-gradient(145deg,#0B4D30,#0F7A4A); }
+.esg-pillar--s { background:linear-gradient(145deg,#0A2570,#0052FF); }
+.esg-pillar--g { background:linear-gradient(145deg,#3B1A5A,#6B3FA0); }
+.esg-letter {
+  font-family:var(--font-display); font-size:6rem; font-weight:900;
+  opacity:.1; position:absolute; bottom:-1.25rem; right:.75rem;
+  line-height:1; pointer-events:none;
+}
+.esg-tag {
+  font-family:var(--font-mono); font-size:.68rem;
+  letter-spacing:.18em; text-transform:uppercase;
+  opacity:.6; margin-bottom:.75rem; display:block;
+}
+.esg-title { font-family:var(--font-display); font-size:1.8rem; font-weight:700; margin-bottom:1rem; }
+.esg-desc  { font-size:.875rem; opacity:.72; line-height:1.75; margin-bottom:1.5rem; }
+.esg-targets { display:flex; flex-direction:column; gap:.4rem; }
+.esg-target {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:.82rem; padding:.45rem 0;
+  border-bottom:1px solid rgba(255,255,255,.1);
+}
+.esg-target:last-child { border:none; }
+.esg-target-year { font-family:var(--font-mono); font-weight:500; opacity:.88; }
+.esg-target-desc { opacity:.62; }
+
+/* ── KPI Cards ────────────────────────────────────────────── */
+.kpi-card {
+  background:var(--white); border:1px solid var(--gray-200);
+  border-radius:var(--r-lg); padding:2rem 1.75rem;
+  text-align:center;
+  transition:all .3s var(--ease-out);
+}
+.kpi-card:hover { box-shadow:var(--shadow-md); transform:translateY(-4px); }
+.kpi-icon { font-size:1.75rem; margin-bottom:1rem; }
+.kpi-val {
+  font-family:var(--font-display); font-size:2.4rem;
+  font-weight:700; color:var(--navy); line-height:1;
+  margin-bottom:.4rem;
+}
+.kpi-val span { color:var(--blue); font-size:1.6rem; }
+.kpi-label { font-size:.8rem; color:var(--gray-500); font-weight:600; }
+.kpi-sub   { font-size:.75rem; color:var(--gray-500); margin-top:.25rem; font-family:var(--font-mono); }
+</style>
+</head>
+<body>
+
+<div id="nav-slot"></div>
+
+<header class="page-header">
+  <div class="page-header__inner">
+    <div class="page-header__kicker">
+      <span class="page-header__kicker-dot"></span>ESG
+    </div>
+    <h1 class="page-header__title">우리의<br><em>약속</em>과 책임</h1>
+    <p class="page-header__desc">환경·사회·지배구조를 아우르는 지속가능한 경영으로 더 나은 미래를 만들어갑니다</p>
+  </div>
+</header>
+
+<!-- ── ESG Pillars ────────────────────────────────────────── -->
+<section class="section section--cream">
+  <div class="container">
+    <div class="sec-row">
+      <div class="fi">
+        <span class="eyebrow">ESG Framework</span>
+        <h2 class="sec-title">ESG 경영</h2>
+        <span class="rule"></span>
+        <p class="sec-desc">환경, 사회, 지배구조 세 가지 축으로 지속가능경영을 실천합니다</p>
+      </div>
+    </div>
+    <div class="grid-3">
+      <div class="esg-pillar esg-pillar--e fi">
+        <div class="esg-letter">E</div>
+        <span class="esg-tag">Environmental</span>
+        <div class="esg-title">환경</div>
+        <p class="esg-desc">재생에너지 전환, 탄소배출 감축을 통해 지구 환경 보전에 앞장섭니다. 2040년 탄소중립을 향해 단계적으로 나아갑니다.</p>
+        <div class="esg-targets">
+          <div class="esg-target"><span class="esg-target-year">2030</span><span class="esg-target-desc">탄소배출 50% 감축</span></div>
+          <div class="esg-target"><span class="esg-target-year">2035</span><span class="esg-target-desc">재생에너지 100% 전환</span></div>
+          <div class="esg-target"><span class="esg-target-year">2040</span><span class="esg-target-desc">탄소중립 Net-Zero 달성</span></div>
+        </div>
+      </div>
+      <div class="esg-pillar esg-pillar--s fi fi-d1">
+        <div class="esg-letter">S</div>
+        <span class="esg-tag">Social</span>
+        <div class="esg-title">사회</div>
+        <p class="esg-desc">임직원 복지, 다양성·포용성, 지역사회 기여를 통해 건강한 생태계를 만들고 사회적 책임을 다합니다.</p>
+        <div class="esg-targets">
+          <div class="esg-target"><span class="esg-target-year">여성임원</span><span class="esg-target-desc">30% 달성 목표</span></div>
+          <div class="esg-target"><span class="esg-target-year">봉사</span><span class="esg-target-desc">연 10,000시간 이상</span></div>
+          <div class="esg-target"><span class="esg-target-year">교육</span><span class="esg-target-desc">청소년 IT 교육 지원</span></div>
+        </div>
+      </div>
+      <div class="esg-pillar esg-pillar--g fi fi-d2">
+        <div class="esg-letter">G</div>
+        <span class="esg-tag">Governance</span>
+        <div class="esg-title">지배구조</div>
+        <p class="esg-desc">투명한 경영과 책임있는 의사결정 체계를 통해 모든 이해관계자의 신뢰를 구축하고 유지합니다.</p>
+        <div class="esg-targets">
+          <div class="esg-target"><span class="esg-target-year">이사회</span><span class="esg-target-desc">사외이사 과반 구성</span></div>
+          <div class="esg-target"><span class="esg-target-year">공시</span><span class="esg-target-desc">GRI · TCFD 기준 준수</span></div>
+          <div class="esg-target"><span class="esg-target-year">윤리</span><span class="esg-target-desc">내부신고 제도 운영</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Environmental KPIs & Progress ─────────────────────── -->
+<section class="section section--white">
+  <div class="container">
+    <div class="sec-row">
+      <div class="fi">
+        <span class="eyebrow">Environmental</span>
+        <h2 class="sec-title">환경 실행 현황</h2>
+        <span class="rule"></span>
+      </div>
+    </div>
+    <div class="grid-4" style="margin-bottom:3rem">
+      <div class="kpi-card fi">
+        <div class="kpi-icon">🌡️</div>
+        <div class="kpi-val" data-target="38" data-suffix="%">0<span>%</span></div>
+        <div class="kpi-label">탄소배출 감축</div>
+        <div class="kpi-sub">2020년 대비</div>
+      </div>
+      <div class="kpi-card fi fi-d1">
+        <div class="kpi-icon">⚡</div>
+        <div class="kpi-val" data-target="62" data-suffix="%">0<span>%</span></div>
+        <div class="kpi-label">재생에너지 전환</div>
+        <div class="kpi-sub">전체 사용량 대비</div>
+      </div>
+      <div class="kpi-card fi fi-d2">
+        <div class="kpi-icon">♻️</div>
+        <div class="kpi-val" data-target="81" data-suffix="%">0<span>%</span></div>
+        <div class="kpi-label">폐기물 재활용률</div>
+        <div class="kpi-sub">전체 폐기물 대비</div>
+      </div>
+      <div class="kpi-card fi fi-d3">
+        <div class="kpi-icon">💧</div>
+        <div class="kpi-val" data-target="45" data-suffix="%">0<span>%</span></div>
+        <div class="kpi-label">용수 사용량 절감</div>
+        <div class="kpi-sub">2020년 대비</div>
+      </div>
+    </div>
+    <div class="fi">
+      <h3 style="font-size:1.1rem; font-weight:700; color:var(--navy); margin-bottom:1.5rem">목표 달성 진행률</h3>
+      <div class="progress-item">
+        <div class="progress-header"><span>탄소배출 감축 (목표: 50%)</span><span>38%</span></div>
+        <div class="progress-track"><div class="progress-fill" data-width="76"></div></div>
+      </div>
+      <div class="progress-item">
+        <div class="progress-header"><span>재생에너지 전환 (목표: 100%)</span><span>62%</span></div>
+        <div class="progress-track"><div class="progress-fill" data-width="62"></div></div>
+      </div>
+      <div class="progress-item">
+        <div class="progress-header"><span>폐기물 재활용 (목표: 95%)</span><span>81%</span></div>
+        <div class="progress-track"><div class="progress-fill" data-width="85"></div></div>
+      </div>
+      <div class="progress-item">
+        <div class="progress-header"><span>임직원 다양성 (여성임원 30% 목표)</span><span>22%</span></div>
+        <div class="progress-track"><div class="progress-fill" data-width="73"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Social & Governance Accordion ─────────────────────── -->
+<section class="section section--cream">
+  <div class="container">
+    <div class="grid-2" style="gap:4rem; align-items:start">
+      <div class="fi">
+        <span class="eyebrow">Social</span>
+        <h2 class="sec-title" style="font-size:clamp(1.6rem,2.5vw,2.2rem)">사회적 책임</h2>
+        <span class="rule"></span>
+        <div class="accordion">
+          <div class="accordion-item">
+            <div class="accordion-header">임직원 복지 프로그램<span class="accordion-icon">+</span></div>
+            <div class="accordion-content">
+              <div class="accordion-body">유연근무제, 육아휴직 100% 보장, 자녀 학자금 지원, 사내 헬스케어 센터 운영 등 임직원의 일·생활 균형을 적극 지원합니다. 재택근무 인프라와 심리 상담 서비스도 제공합니다.</div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-header">다양성·포용성 (D&amp;I)<span class="accordion-icon">+</span></div>
+            <div class="accordion-content">
+              <div class="accordion-body">여성 임원 비율 30% 목표, 장애인 고용 의무 비율 초과 달성, 외국인 임직원 포용 프로그램을 운영합니다. 무의식적 편견 교육을 전 임직원에게 실시합니다.</div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-header">지역사회 공헌<span class="accordion-icon">+</span></div>
+            <div class="accordion-content">
+              <div class="accordion-body">연간 임직원 봉사 시간 1만 시간 목표, 청소년 IT 교육 지원, 중소기업 디지털 전환 지원 프로그램을 운영합니다. NEXCORE Foundation을 통해 사회공헌 활동을 체계화합니다.</div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-header">안전 · 보건 경영<span class="accordion-icon">+</span></div>
+            <div class="accordion-content">
+              <div class="accordion-body">ISO 45001 안전보건경영시스템 인증을 유지하며 임직원의 안전한 근무 환경을 조성합니다. 산업재해 제로를 목표로 예방 중심의 안전문화를 구축합니다.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fi fi-d1">
+        <span class="eyebrow">Governance</span>
+        <h2 class="sec-title" style="font-size:clamp(1.6rem,2.5vw,2.2rem)">지배구조</h2>
+        <span class="rule"></span>
+        <div class="accordion">
+          <div class="accordion-item">
+            <div class="accordion-header">이사회 구성<span class="accordion-icon">+</span></div>
+            <div class="accordion-content">
+              <div class="accordion-body">사외이사 과반수 구성, 이사회 내 ESG 위원회·감사위원회·보상위원회를 독립적으로 운영합니다. 이사회 다양성 제고를 위해 여성 사외이사를 선임합니다.</div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-header">윤리·컴플라이언스<span class="accordion-icon">+</span></div>
+            <div class="accordion-content">
+              <div class="accordion-body">임직원 윤리강령, 내부신고제도, 부패방지 교육을 통해 투명한 경영 문화를 구축합니다. 공정거래 자율준수 프로그램(CP)을 운영하며 협력사 윤리경영도 함께 강화합니다.</div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-header">ESG 정보 공시<span class="accordion-icon">+</span></div>
+            <div class="accordion-content">
+              <div class="accordion-body">GRI Standards, TCFD, UN SDGs 기준에 따른 ESG 보고서를 매년 발간합니다. 제3자 검증을 통해 공시 정보의 신뢰성을 확보합니다.</div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-header">공급망 ESG 관리<span class="accordion-icon">+</span></div>
+            <div class="accordion-content">
+              <div class="accordion-body">협력사 ESG 평가 체계를 운영하며 공급망 전반에 걸쳐 환경·인권·노동 기준을 준수합니다. 협력사 ESG 역량 강화 지원 프로그램도 함께 운영합니다.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="footer-slot"></div>
+
+<script src="../js/components.js"></script>
+<script src="../js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  App.initAccordion('.accordion');
+});
+</script>
+</body>
+</html>

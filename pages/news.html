@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="NEXCORE 소식 — 공지사항, 보도자료, ESG, 투자정보"/>
+<title>NEXCORE — 소식</title>
+<link rel="stylesheet" href="../css/style.css"/>
+<link rel="stylesheet" href="../css/nav.css"/>
+<style>
+/* ── Filter Bar ───────────────────────────────────────────── */
+.filter-bar { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:2.5rem; }
+.filter-btn {
+  padding:.45rem 1.1rem; border-radius:100px;
+  font-size:.83rem; font-weight:600;
+  border:1.5px solid var(--gray-200); color:var(--gray-500);
+  background:transparent; transition:all .2s; cursor:pointer;
+  font-family:var(--font-body);
+}
+.filter-btn:hover, .filter-btn.active {
+  border-color:var(--blue); color:var(--blue);
+  background:rgba(0,82,255,.06);
+}
+
+/* ── Featured ─────────────────────────────────────────────── */
+.news-featured {
+  background:var(--navy); border-radius:var(--r-xl);
+  padding:3rem; color:white;
+  display:grid; grid-template-columns:1fr auto;
+  gap:2rem; align-items:center; margin-bottom:2.5rem;
+  position:relative; overflow:hidden;
+}
+.news-featured::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse 60% 80% at 80% 50%, rgba(0,82,255,.2), transparent 65%);
+  pointer-events:none;
+}
+.news-featured > * { position:relative; z-index:1; }
+.news-featured__kicker {
+  font-family:var(--font-mono); font-size:.7rem;
+  letter-spacing:.2em; color:var(--gold); text-transform:uppercase; margin-bottom:.875rem; display:block;
+}
+.news-featured__title {
+  font-family:var(--font-display); font-size:clamp(1.4rem,2.5vw,2rem);
+  font-weight:700; line-height:1.2; color:white; letter-spacing:-.01em;
+}
+.news-featured__date { font-family:var(--font-mono); font-size:.78rem; color:rgba(255,255,255,.4); margin-top:.875rem; display:block; }
+
+/* ── News List ────────────────────────────────────────────── */
+.news-list { display:flex; flex-direction:column; gap:.6rem; }
+.news-item {
+  display:grid; grid-template-columns:auto 1fr auto;
+  gap:1.5rem; align-items:start;
+  padding:1.5rem 1.75rem;
+  background:var(--white); border-radius:var(--r-md);
+  border:1px solid var(--gray-200);
+  transition:all .25s var(--ease-out);
+  cursor:pointer;
+}
+.news-item:hover { border-color:var(--blue); box-shadow:var(--shadow-sm); transform:translateX(4px); }
+.news-item__num {
+  font-family:var(--font-display); font-size:1.8rem;
+  color:var(--gray-200); font-weight:700; line-height:1; width:40px; text-align:right;
+}
+.news-item__title { font-size:.975rem; font-weight:700; color:var(--navy); line-height:1.45; margin-bottom:.35rem; }
+.news-item__desc  { font-size:.83rem; color:var(--gray-500); line-height:1.6; }
+.news-item__meta  { display:flex; flex-direction:column; align-items:flex-end; gap:.4rem; }
+.news-item__date  { font-family:var(--font-mono); font-size:.75rem; color:var(--gray-500); white-space:nowrap; }
+.news-arrow { font-size:.9rem; color:var(--gray-200); transition:color .2s; }
+.news-item:hover .news-arrow { color:var(--blue); }
+
+/* ── Pagination ───────────────────────────────────────────── */
+.pagination { display:flex; gap:.4rem; justify-content:center; margin-top:2.5rem; }
+.page-btn {
+  width:38px; height:38px; border-radius:6px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.875rem; font-weight:600;
+  border:1.5px solid var(--gray-200); color:var(--gray-500);
+  background:transparent; transition:all .2s; cursor:pointer; font-family:var(--font-body);
+}
+.page-btn:hover, .page-btn.active { border-color:var(--blue); color:var(--blue); background:rgba(0,82,255,.06); }
+
+@media(max-width:640px){
+  .news-item { grid-template-columns:1fr; }
+  .news-item__num { display:none; }
+  .news-featured { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="nav-slot"></div>
+
+<header class="page-header">
+  <div class="page-header__inner">
+    <div class="page-header__kicker">
+      <span class="page-header__kicker-dot"></span>News
+    </div>
+    <h1 class="page-header__title">NEXCORE<br><em>소식</em></h1>
+    <p class="page-header__desc">회사의 최신 뉴스, 보도자료, ESG 소식과 투자정보를 전달합니다</p>
+  </div>
+</header>
+
+<section class="section section--cream">
+  <div class="container">
+
+    <!-- Featured -->
+    <div class="news-featured fi">
+      <div>
+        <span class="news-featured__kicker">Latest · 보도자료</span>
+        <div class="news-featured__title">글로벌 AI 파트너십 체결 —<br>미국·독일·일본 3개국 동시 진출 확정</div>
+        <span class="news-featured__date">2025.07.20</span>
+      </div>
+      <a href="#" class="btn btn--ghost" style="flex-shrink:0">자세히 보기 →</a>
+    </div>
+
+    <!-- Filter -->
+    <div class="filter-bar fi">
+      <button class="filter-btn active" data-filter="all">전체</button>
+      <button class="filter-btn" data-filter="notice">공지사항</button>
+      <button class="filter-btn" data-filter="press">보도자료</button>
+      <button class="filter-btn" data-filter="esg">ESG</button>
+      <button class="filter-btn" data-filter="ir">투자정보</button>
+    </div>
+
+    <!-- List -->
+    <div class="news-list fi" id="newsList">
+      <div class="news-item" data-cat="press">
+        <div class="news-item__num">01</div>
+        <div>
+          <span class="card__tag card__tag--press">보도자료</span>
+          <div class="news-item__title">글로벌 AI 파트너십 체결 — 미국·독일·일본 3개국 동시 진출</div>
+          <div class="news-item__desc">실리콘밸리, 베를린, 도쿄에 현지 법인 설립 및 파트너십 체결 발표</div>
+        </div>
+        <div class="news-item__meta">
+          <span class="news-item__date">2025.07.20</span>
+          <span class="news-arrow">→</span>
+        </div>
+      </div>
+      <div class="news-item" data-cat="notice">
+        <div class="news-item__num">02</div>
+        <div>
+          <span class="card__tag card__tag--notice">공지사항</span>
+          <div class="news-item__title">2025년 상반기 사업실적 발표 — 매출 23% 성장</div>
+          <div class="news-item__desc">전년 동기 대비 매출 23% 성장, 영업이익 개선세 지속</div>
+        </div>
+        <div class="news-item__meta">
+          <span class="news-item__date">2025.07.15</span>
+          <span class="news-arrow">→</span>
+        </div>
+      </div>
+      <div class="news-item" data-cat="esg">
+        <div class="news-item__num">03</div>
+        <div>
+          <span class="card__tag card__tag--esg">ESG</span>
+          <div class="news-item__title">탄소중립 2040 선언 및 실행 로드맵 공개</div>
+          <div class="news-item__desc">TCFD 기준에 따른 기후위기 대응 전략 및 단계별 실행 계획 발표</div>
+        </div>
+        <div class="news-item__meta">
+          <span class="news-item__date">2025.06.10</span>
+          <span class="news-arrow">→</span>
+        </div>
+      </div>
+      <div class="news-item" data-cat="ir">
+        <div class="news-item__num">04</div>
+        <div>
+          <span class="card__tag card__tag--ir">투자정보</span>
+          <div class="news-item__title">2025년 1분기 실적 발표 (매출 2,780억원, YoY +23.6%)</div>
+          <div class="news-item__desc">전분기 대비 11% 성장, 연간 실적 가이던스 상향 조정</div>
+        </div>
+        <div class="news-item__meta">
+          <span class="news-item__date">2025.05.02</span>
+          <span class="news-arrow">→</span>
+        </div>
+      </div>
+      <div class="news-item" data-cat="press">
+        <div class="news-item__num">05</div>
+        <div>
+          <span class="card__tag card__tag--press">보도자료</span>
+          <div class="news-item__title">차세대 하이브리드 클라우드 플랫폼 'CloudX' 정식 출시</div>
+          <div class="news-item__desc">온프레미스와 멀티클라우드를 통합 관리하는 신규 플랫폼 출시</div>
+        </div>
+        <div class="news-item__meta">
+          <span class="news-item__date">2025.04.14</span>
+          <span class="news-arrow">→</span>
+        </div>
+      </div>
+      <div class="news-item" data-cat="notice">
+        <div class="news-item__num">06</div>
+        <div>
+          <span class="card__tag card__tag--notice">공지사항</span>
+          <div class="news-item__title">2025년 신규 채용 공고 — 전 직군 200명 모집</div>
+          <div class="news-item__desc">AI, 클라우드, 보안, 기획 등 전 직군 채용 진행 예정</div>
+        </div>
+        <div class="news-item__meta">
+          <span class="news-item__date">2025.03.20</span>
+          <span class="news-arrow">→</span>
+        </div>
+      </div>
+      <div class="news-item" data-cat="esg">
+        <div class="news-item__num">07</div>
+        <div>
+          <span class="card__tag card__tag--esg">ESG</span>
+          <div class="news-item__title">2024 ESG 보고서 발간 — GRI · TCFD 기준 준수</div>
+          <div class="news-item__desc">지속가능경영 성과와 2025년 ESG 전략 방향 공개</div>
+        </div>
+        <div class="news-item__meta">
+          <span class="news-item__date">2025.03.15</span>
+          <span class="news-arrow">→</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination fi">
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <button class="page-btn">→</button>
+    </div>
+  </div>
+</section>
+
+<div id="footer-slot"></div>
+
+<script src="../js/components.js"></script>
+<script src="../js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var filterBtns = document.querySelectorAll('.filter-btn[data-filter]');
+  var newsItems  = document.querySelectorAll('.news-item[data-cat]');
+  filterBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      filterBtns.forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      var f = btn.dataset.filter;
+      newsItems.forEach(function(item) {
+        item.style.display = (f === 'all' || item.dataset.cat === f) ? 'grid' : 'none';
+      });
+    });
+  });
+});
+</script>
+</body>
+</html>

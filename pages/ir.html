@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="NEXCORE 투자정보 — 주가, 재무정보, IR 자료실"/>
+<title>NEXCORE — 투자정보</title>
+<link rel="stylesheet" href="../css/style.css"/>
+<link rel="stylesheet" href="../css/nav.css"/>
+<style>
+/* ── KPI Cards ────────────────────────────────────────────── */
+.kpi-strip {
+  background:var(--blue); padding:3rem 0;
+}
+.kpi-strip-grid {
+  max-width:var(--max); margin:0 auto; padding:0 var(--pad);
+  display:grid; grid-template-columns:repeat(4,1fr); gap:2px;
+}
+.kpi-strip-item { text-align:center; padding:1.5rem 1rem; border-right:1px solid rgba(255,255,255,.15); }
+.kpi-strip-item:last-child { border:none; }
+.kpi-strip-val  { font-family:var(--font-display); font-size:clamp(1.8rem,3vw,2.8rem); color:white; font-weight:700; line-height:1; }
+.kpi-strip-val span { color:rgba(255,255,255,.65); font-size:clamp(1.2rem,2vw,1.8rem); }
+.kpi-strip-label { font-size:.75rem; color:rgba(255,255,255,.65); letter-spacing:.12em; text-transform:uppercase; margin-top:.5rem; }
+
+/* ── IR Layout ────────────────────────────────────────────── */
+.ir-layout { display:grid; grid-template-columns:1fr 1.5fr; gap:4rem; align-items:start; }
+
+/* ── Table Section ────────────────────────────────────────── */
+.table-wrap { overflow-x:auto; border-radius:var(--r-md); border:1px solid var(--gray-200); }
+
+/* ── Contact CTA ──────────────────────────────────────────── */
+.ir-contact {
+  background:var(--navy); border-radius:var(--r-xl);
+  padding:2.5rem; color:white;
+  display:flex; justify-content:space-between; align-items:center; gap:2rem;
+  flex-wrap:wrap;
+}
+.ir-contact-title { font-family:var(--font-display); font-size:1.4rem; font-weight:700; margin-bottom:.5rem; }
+.ir-contact-desc  { font-size:.875rem; opacity:.6; }
+.ir-contact-btns  { display:flex; gap:.75rem; flex-wrap:wrap; flex-shrink:0; }
+
+@media(max-width:960px){ .ir-layout { grid-template-columns:1fr; } }
+@media(max-width:640px){
+  .kpi-strip-grid { grid-template-columns:repeat(2,1fr); }
+  .kpi-strip-item { border-right:none; border-bottom:1px solid rgba(255,255,255,.15); }
+  .kpi-strip-item:nth-child(odd) { border-right:1px solid rgba(255,255,255,.15); }
+}
+</style>
+</head>
+<body>
+
+<div id="nav-slot"></div>
+
+<header class="page-header">
+  <div class="page-header__inner">
+    <div class="page-header__kicker">
+      <span class="page-header__kicker-dot"></span>Investor Relations
+    </div>
+    <h1 class="page-header__title">투자<em>정보</em></h1>
+    <p class="page-header__desc">주주 및 투자자를 위한 재무 정보, 주가 현황, IR 자료를 투명하게 공개합니다</p>
+  </div>
+</header>
+
+<!-- ── KPI Strip ──────────────────────────────────────────── -->
+<div class="kpi-strip">
+  <div class="kpi-strip-grid fi">
+    <div class="kpi-strip-item">
+      <div class="kpi-strip-val" data-target="1" data-suffix="조+">0<span>조+</span></div>
+      <div class="kpi-strip-label">2024 연간 매출</div>
+    </div>
+    <div class="kpi-strip-item">
+      <div class="kpi-strip-val" data-target="12" data-suffix="%">0<span>%</span></div>
+      <div class="kpi-strip-label">영업이익률</div>
+    </div>
+    <div class="kpi-strip-item">
+      <div class="kpi-strip-val" data-target="23" data-suffix="%">0<span>%</span></div>
+      <div class="kpi-strip-label">YoY 매출 성장률</div>
+    </div>
+    <div class="kpi-strip-item">
+      <div class="kpi-strip-val" data-target="5" data-suffix=".8조">0<span>.8조</span></div>
+      <div class="kpi-strip-label">시가총액</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Stock + Docs ───────────────────────────────────────── -->
+<section class="section section--cream">
+  <div class="container">
+    <div class="ir-layout">
+      <!-- Stock Widget -->
+      <div class="fi">
+        <span class="eyebrow">Stock Information</span>
+        <h2 class="sec-title" style="font-size:clamp(1.6rem,2.5vw,2rem); margin-bottom:1.5rem">주가 정보</h2>
+        <div class="stock-widget">
+          <div class="stock-ticker">NEXCORE · KOSPI 123456</div>
+          <div class="stock-price">48,500</div>
+          <div class="stock-change">▲ 1,200 (+2.54%)</div>
+          <div class="stock-row"><span class="stock-row-label">시가</span><span class="stock-row-val">47,600</span></div>
+          <div class="stock-row"><span class="stock-row-label">고가</span><span class="stock-row-val">49,100</span></div>
+          <div class="stock-row"><span class="stock-row-label">저가</span><span class="stock-row-val">47,300</span></div>
+          <div class="stock-row"><span class="stock-row-label">거래량</span><span class="stock-row-val">1,248,500</span></div>
+          <div class="stock-row"><span class="stock-row-label">시가총액</span><span class="stock-row-val">5.8조원</span></div>
+          <div class="stock-row"><span class="stock-row-label">52주 최고</span><span class="stock-row-val">56,400</span></div>
+          <div class="stock-row"><span class="stock-row-label">52주 최저</span><span class="stock-row-val">37,100</span></div>
+          <div class="stock-row" style="border:none">
+            <span class="stock-row-label">기준일</span>
+            <span style="color:rgba(255,255,255,.3); font-size:.76rem; font-family:var(--font-mono)">2025.07.18</span>
+          </div>
+        </div>
+      </div>
+      <!-- IR Docs -->
+      <div class="fi fi-d1">
+        <span class="eyebrow">IR Documents</span>
+        <h2 class="sec-title" style="font-size:clamp(1.6rem,2.5vw,2rem); margin-bottom:1.5rem">IR 자료실</h2>
+        <div class="ir-doc">
+          <div class="ir-doc-icon">📋</div>
+          <div class="ir-doc-info">
+            <div class="ir-doc-title">2025년 1분기 실적 발표 자료</div>
+            <div class="ir-doc-date">2025.05.02</div>
+          </div>
+          <span class="ir-doc-btn">PDF</span>
+        </div>
+        <div class="ir-doc">
+          <div class="ir-doc-icon">📊</div>
+          <div class="ir-doc-info">
+            <div class="ir-doc-title">2024 연간보고서 (Annual Report)</div>
+            <div class="ir-doc-date">2025.03.28</div>
+          </div>
+          <span class="ir-doc-btn">PDF</span>
+        </div>
+        <div class="ir-doc">
+          <div class="ir-doc-icon">🌱</div>
+          <div class="ir-doc-info">
+            <div class="ir-doc-title">2024 ESG 보고서</div>
+            <div class="ir-doc-date">2025.03.15</div>
+          </div>
+          <span class="ir-doc-btn">PDF</span>
+        </div>
+        <div class="ir-doc">
+          <div class="ir-doc-icon">🏛️</div>
+          <div class="ir-doc-info">
+            <div class="ir-doc-title">2024 사업보고서</div>
+            <div class="ir-doc-date">2025.03.31</div>
+          </div>
+          <span class="ir-doc-btn">PDF</span>
+        </div>
+        <div class="ir-doc">
+          <div class="ir-doc-icon">📈</div>
+          <div class="ir-doc-info">
+            <div class="ir-doc-title">2024년 4분기 실적 발표 자료</div>
+            <div class="ir-doc-date">2025.02.14</div>
+          </div>
+          <span class="ir-doc-btn">PDF</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Financial Table ────────────────────────────────────── -->
+<section class="section section--white">
+  <div class="container">
+    <div class="sec-row">
+      <div class="fi">
+        <span class="eyebrow">Financials</span>
+        <h2 class="sec-title">분기별 재무 현황</h2>
+        <span class="rule"></span>
+      </div>
+    </div>
+    <div class="table-wrap fi">
+      <table class="fin-table">
+        <thead>
+          <tr>
+            <th>구분</th>
+            <th>2024 Q1</th>
+            <th>2024 Q2</th>
+            <th>2024 Q3</th>
+            <th>2024 Q4</th>
+            <th>2025 Q1</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>매출액 (억원)</td>
+            <td>2,250</td>
+            <td>2,480</td>
+            <td>2,710</td>
+            <td>2,830</td>
+            <td>2,780</td>
+          </tr>
+          <tr>
+            <td>영업이익 (억원)</td>
+            <td>245</td>
+            <td>298</td>
+            <td>335</td>
+            <td>360</td>
+            <td>342</td>
+          </tr>
+          <tr>
+            <td>영업이익률</td>
+            <td>10.9%</td>
+            <td>12.0%</td>
+            <td>12.4%</td>
+            <td>12.7%</td>
+            <td class="positive">12.3%</td>
+          </tr>
+          <tr>
+            <td>순이익 (억원)</td>
+            <td>187</td>
+            <td>228</td>
+            <td>261</td>
+            <td>285</td>
+            <td>264</td>
+          </tr>
+          <tr>
+            <td>YoY 매출 성장률</td>
+            <td>18.2%</td>
+            <td>21.4%</td>
+            <td>24.1%</td>
+            <td>26.3%</td>
+            <td class="positive">+23.6%</td>
+          </tr>
+          <tr>
+            <td>EPS (원)</td>
+            <td>1,540</td>
+            <td>1,876</td>
+            <td>2,147</td>
+            <td>2,346</td>
+            <td>2,172</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── IR Contact ─────────────────────────────────────────── -->
+<section class="section section--cream">
+  <div class="container">
+    <div class="ir-contact fi">
+      <div>
+        <div class="ir-contact-title">투자자 문의</div>
+        <p class="ir-contact-desc">IR 관련 문의 사항은 아래 연락처로 연락해 주시기 바랍니다.</p>
+      </div>
+      <div class="ir-contact-btns">
+        <a href="tel:0212345699" class="btn btn--primary">📞 02-1234-5699</a>
+        <a href="mailto:ir@nexcore.co.kr" class="btn btn--ghost">✉️ ir@nexcore.co.kr</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="footer-slot"></div>
+
+<script src="../js/components.js"></script>
+<script src="../js/main.js"></script>
+</body>
+</html>
