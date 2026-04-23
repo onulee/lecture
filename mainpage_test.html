@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Joshua.site | AI Automation Agency</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #1e1e2e;
+      --accent: #7c3aed;
+      --accent-light: #a78bfa;
+      --accent-glow: rgba(124, 58, 237, 0.3);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --white: #ffffff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--white);
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-logo span { color: var(--accent-light); }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--white); }
+
+    .nav-cta {
+      background: var(--accent);
+      color: var(--white) !important;
+      padding: 0.5rem 1.25rem;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: background 0.2s, box-shadow 0.2s !important;
+    }
+
+    .nav-cta:hover {
+      background: #6d28d9 !important;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px; left: 50%;
+      transform: translateX(-50%);
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(124, 58, 237, 0.1);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+      color: var(--accent-light);
+      padding: 0.35rem 1rem;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-badge::before { content: '●'; font-size: 0.5rem; }
+
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      color: var(--white);
+      max-width: 800px;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 .gradient {
+      background: linear-gradient(135deg, #a78bfa, #7c3aed, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 560px;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--white);
+      padding: 0.85rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      background: #6d28d9;
+      box-shadow: 0 0 30px var(--accent-glow);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      padding: 0.85rem 2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      transition: border-color 0.2s, transform 0.15s;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent-light);
+      transform: translateY(-1px);
+    }
+
+    /* STATS */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+      margin-top: 4rem;
+      padding-top: 3rem;
+      border-top: 1px solid var(--border);
+      width: 100%;
+      max-width: 700px;
+    }
+
+    .stat-item { text-align: center; }
+
+    .stat-num {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -1px;
+    }
+
+    .stat-num span { color: var(--accent-light); }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* SECTIONS */
+    section {
+      padding: 5rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      display: inline-block;
+      color: var(--accent-light);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    h2 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.5px;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+
+    .section-sub {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 560px;
+      margin-bottom: 3rem;
+    }
+
+    /* SERVICES GRID */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .service-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .service-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(124, 58, 237, 0.15);
+    }
+
+    .service-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .service-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+    }
+
+    .service-card p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* PROCESS */
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .step {
+      position: relative;
+      padding: 1.75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .step-num {
+      font-size: 3rem;
+      font-weight: 900;
+      color: rgba(124, 58, 237, 0.15);
+      line-height: 1;
+      margin-bottom: 0.75rem;
+    }
+
+    .step h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.4rem;
+    }
+
+    .step p {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    /* TESTIMONIALS */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .testimonial {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+    }
+
+    .testimonial-text {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.7;
+      margin-bottom: 1.25rem;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .author-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #ec4899);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--white);
+      flex-shrink: 0;
+    }
+
+    .author-name {
+      font-weight: 600;
+      color: var(--white);
+      font-size: 0.9rem;
+    }
+
+    .author-role {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .stars { color: #fbbf24; font-size: 0.85rem; margin-bottom: 0.75rem; }
+
+    /* CTA SECTION */
+    .cta-section {
+      text-align: center;
+      padding: 5rem 2rem;
+      background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(236,72,153,0.05));
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cta-section h2 { margin-bottom: 1rem; }
+    .cta-section p { color: var(--muted); max-width: 500px; margin: 0 auto 2rem; }
+
+    /* FOOTER */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 3rem 2rem 2rem;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+    }
+
+    .footer-brand p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-top: 0.75rem;
+      max-width: 260px;
+    }
+
+    .footer-col h4 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--white);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+
+    .footer-col ul { list-style: none; }
+
+    .footer-col li { margin-bottom: 0.5rem; }
+
+    .footer-col a {
+      font-size: 0.88rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-col a:hover { color: var(--white); }
+
+    .footer-bottom {
+      max-width: 1100px;
+      margin: 2rem auto 0;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      color: var(--muted);
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .footer-inner { grid-template-columns: 1fr 1fr; }
+      .stats { gap: 2rem; }
+    }
+
+    @media (max-width: 480px) {
+      .footer-inner { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">joshua<span>.site</span></a>
+    <ul class="nav-links">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#testimonials">Results</a></li>
+      <li><a href="#contact" class="nav-cta">Book a Call</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">AI Automation Agency</div>
+    <h1>We Build AI Systems That <span class="gradient">Work While You Sleep</span></h1>
+    <p class="hero-sub">
+      Automate repetitive workflows, eliminate manual errors, and scale your business
+      with custom AI solutions — built fast, deployed faster.
+    </p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary">Book a Free Strategy Call</a>
+      <a href="#services" class="btn-secondary">See What We Do →</a>
+    </div>
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-num">50<span>+</span></div>
+        <div class="stat-label">Automations Built</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">10<span>x</span></div>
+        <div class="stat-label">Average ROI</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">48<span>h</span></div>
+        <div class="stat-label">Avg. Turnaround</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <span class="section-label">What We Build</span>
+    <h2>AI Automation Services</h2>
+    <p class="section-sub">
+      From lead generation to customer support, we automate the workflows that drain
+      your team's time and energy.
+    </p>
+    <div class="services-grid">
+      <div class="service-card">
+        <span class="service-icon">🤖</span>
+        <h3>AI Agents & Chatbots</h3>
+        <p>Custom GPT-powered agents that handle customer inquiries, qualify leads, and book meetings — 24/7, no human needed.</p>
+      </div>
+      <div class="service-card">
+        <span class="service-icon">⚡</span>
+        <h3>Workflow Automation</h3>
+        <p>Connect your tools (CRM, email, Slack, sheets) and automate multi-step processes with zero-code pipelines powered by AI.</p>
+      </div>
+      <div class="service-card">
+        <span class="service-icon">📊</span>
+        <h3>AI-Powered Analytics</h3>
+        <p>Turn raw data into actionable insights with automated reporting dashboards and AI-driven anomaly detection.</p>
+      </div>
+      <div class="service-card">
+        <span class="service-icon">✉️</span>
+        <h3>Outreach Automation</h3>
+        <p>Hyper-personalized cold email and LinkedIn sequences that write themselves using AI — and actually get replies.</p>
+      </div>
+      <div class="service-card">
+        <span class="service-icon">🔗</span>
+        <h3>System Integrations</h3>
+        <p>Seamlessly connect legacy systems, APIs, and SaaS tools so your data flows where it needs to go, automatically.</p>
+      </div>
+      <div class="service-card">
+        <span class="service-icon">🧠</span>
+        <h3>Custom AI Models</h3>
+        <p>Fine-tuned language models trained on your data — for document processing, classification, or domain-specific Q&A.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="process" style="background: var(--surface); max-width: 100%; padding: 5rem 2rem;">
+    <div style="max-width: 1100px; margin: 0 auto;">
+      <span class="section-label">How It Works</span>
+      <h2>From Idea to Automation in Days</h2>
+      <p class="section-sub">A clear, proven process that gets you results without the enterprise red tape.</p>
+      <div class="process-steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <h3>Discovery Call</h3>
+          <p>We map your workflows, identify automation opportunities, and estimate time savings.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <h3>Strategy & Scope</h3>
+          <p>We design the solution architecture and deliver a clear spec with timeline and pricing.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <h3>Build & Test</h3>
+          <p>Our team builds your automation in days, not months — with full QA before handoff.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <h3>Launch & Optimize</h3>
+          <p>We deploy, monitor, and continuously improve your system for peak performance.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials">
+    <span class="section-label">Client Results</span>
+    <h2>Real Businesses, Real Outcomes</h2>
+    <p class="section-sub">Here's what happens when you replace manual work with intelligent automation.</p>
+    <div class="testimonials-grid">
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"Joshua's team built an AI lead qualification bot that saved us 20 hours a week. Our sales team now only talks to prospects who are actually ready to buy."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">MR</div>
+          <div>
+            <div class="author-name">Mark R.</div>
+            <div class="author-role">CEO, B2B SaaS Startup</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"We automated our entire onboarding flow — from signed contract to project kickoff. What used to take 3 days now takes 15 minutes. Game changer."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">SL</div>
+          <div>
+            <div class="author-name">Sophie L.</div>
+            <div class="author-role">Operations Director, Agency</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"The AI outreach system they built books 3-5 calls per week on autopilot. Best ROI investment we've made this year — paid back in the first month."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">JK</div>
+          <div>
+            <div class="author-name">James K.</div>
+            <div class="author-role">Founder, Consulting Firm</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-section" id="contact">
+    <span class="section-label">Get Started</span>
+    <h2>Ready to Automate Your Business?</h2>
+    <p>Book a free 30-minute strategy call. We'll show you exactly where AI can save you the most time and money.</p>
+    <a href="mailto:hello@joshua.site" class="btn-primary" style="font-size: 1.05rem; padding: 1rem 2.5rem;">
+      Book Your Free Call →
+    </a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="#" class="nav-logo" style="font-size: 1.1rem;">joshua<span style="color: var(--accent-light)">.site</span></a>
+        <p>AI Automation Agency helping businesses scale smarter with custom AI workflows and intelligent automation systems.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="#">AI Agents</a></li>
+          <li><a href="#">Workflow Automation</a></li>
+          <li><a href="#">Outreach Systems</a></li>
+          <li><a href="#">Custom AI Models</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Process</a></li>
+          <li><a href="#">Case Studies</a></li>
+          <li><a href="#">Blog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:hello@joshua.site">hello@joshua.site</a></li>
+          <li><a href="#">Book a Call</a></li>
+          <li><a href="#">LinkedIn</a></li>
+          <li><a href="#">Twitter / X</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Joshua.site. All rights reserved.</span>
+      <span>Privacy Policy · Terms of Service</span>
+    </div>
+  </footer>
+
+</body>
+</html>

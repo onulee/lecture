@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartAI Marketing — 회사소개서</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #f2ede6;
+      --cream-dark: #e8e2d9;
+      --navy: #2e3d5b;
+      --navy-light: #3d4f6e;
+      --navy-mid: #4a5f80;
+      --slate: #8a9ab5;
+      --text: #2e3d5b;
+      --muted: #6b7a94;
+      --white: #ffffff;
+      --accent: #4a7fc1;
+      --slide-w: 1280px;
+      --slide-h: 720px;
+    }
+
+    html, body {
+      background: #f5f0e8;
+      font-family: 'Noto Sans KR', 'Inter', sans-serif;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+    }
+
+    /* ── SHELL ── */
+    .shell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 16px;
+      padding: 20px;
+    }
+
+    /* ── VIEWPORT ── */
+    .viewport {
+      position: relative;
+      width: var(--slide-w);
+      height: var(--slide-h);
+      overflow: hidden;
+      border-radius: 4px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.25);
+      flex-shrink: 0;
+    }
+
+    /* scale to fit screen */
+    @media (max-width: 1340px) {
+      .viewport { transform: scale(0.85); transform-origin: top center; }
+      .shell { gap: 0; padding-top: 0; }
+    }
+    @media (max-width: 1100px) {
+      .viewport { transform: scale(0.7); transform-origin: top center; }
+    }
+    @media (max-width: 900px) {
+      .viewport { transform: scale(0.56); transform-origin: top center; }
+    }
+
+    /* ── SLIDES ── */
+    .slides {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+      display: flex;
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ── NAV BAR ── */
+    .nav-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 100px;
+      padding: 8px 20px;
+      z-index: 999;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.75);
+      border-radius: 100px;
+      padding: 4px 14px;
+      font-size: 15px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: color 0.2s;
+      letter-spacing: 0.5px;
+    }
+    .nav-btn:hover { color: #fff; }
+
+    .slide-counter {
+      color: rgba(255,255,255,0.5);
+      font-size: 14px;
+      min-width: 44px;
+      text-align: center;
+    }
+
+    .dots {
+      display: flex;
+      gap: 8px;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .dot.active {
+      background: #fff;
+      transform: scale(1.3);
+    }
+
+    /* ══════════════════════════════
+       SLIDE 1 — COVER
+    ══════════════════════════════ */
+    .s1 {
+      background: var(--navy);
+      flex-direction: row;
+    }
+
+    .s1-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 70px 64px;
+    }
+
+    .s1-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .s1-logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .s1-logo-icon svg { width: 20px; height: 20px; fill: #fff; }
+    .s1-logo-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .s1-center {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .s1-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      width: fit-content;
+    }
+    .s1-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .s1-headline {
+      font-size: 74px;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.05;
+      letter-spacing: -2px;
+    }
+    .s1-headline span { color: var(--accent); }
+
+    .s1-slogan {
+      font-size: 20px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.65);
+      letter-spacing: 0.5px;
+    }
+
+    .s1-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .s1-footer-date {
+      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 1px;
+    }
+    .s1-footer-sub {
+      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 100px;
+      padding: 4px 14px;
+    }
+
+    .s1-right {
+      width: 420px;
+      background: rgba(255,255,255,0.04);
+      border-left: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 52px;
+      gap: 32px;
+    }
+
+    .s1-toc-label {
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .s1-toc-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .s1-toc-num {
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 700;
+      width: 20px;
+    }
+    .s1-toc-text {
+      font-size: 15px;
+      color: rgba(255,255,255,0.65);
+    }
+
+    /* ══════════════════════════════
+       SLIDE 2 — ABOUT US
+    ══════════════════════════════ */
+    .s2 {
+      background: var(--cream);
+      flex-direction: row;
+    }
+
+    .s2-left {
+      width: 480px;
+      background: var(--navy);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 70px 56px;
+    }
+
+    .s2-left-top {}
+    .section-label {
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 16px;
+    }
+    .section-label.dark {
+      color: var(--slate);
+    }
+
+    .s2-left-title {
+      font-size: 54px;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+    }
+
+    .s2-left-desc {
+      font-size: 15px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.8;
+      margin-top: 24px;
+    }
+
+    .s2-left-bottom {}
+
+    .s2-stat {
+      margin-top: 40px;
+    }
+    .s2-stat-row {
+      display: flex;
+      gap: 32px;
+    }
+    .s2-stat-item {}
+    .s2-stat-num {
+      font-size: 38px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .s2-stat-num span { font-size: 20px; color: var(--accent); }
+    .s2-stat-label {
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 2px;
+    }
+
+    .s2-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 70px 64px;
+      gap: 28px;
+    }
+
+    .s2-heading {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: 0.5px;
+      border-left: 3px solid var(--accent);
+      padding-left: 14px;
+    }
+
+    .s2-para {
+      font-size: 18px;
+      color: var(--muted);
+      line-height: 1.85;
+    }
+
+    .s2-cards {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .s2-card {
+      flex: 1;
+      background: #fff;
+      border-radius: 14px;
+      padding: 24px 20px;
+      border: 1px solid var(--cream-dark);
+    }
+    .s2-card-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--navy);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+    .s2-card-icon svg { width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 1.8; }
+    .s2-card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .s2-card-text {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ══════════════════════════════
+       SLIDE 3 — VISION & MISSION
+    ══════════════════════════════ */
+    .s3 {
+      background: var(--cream);
+      flex-direction: column;
+      padding: 60px 72px;
+    }
+
+    .s3-header {
+      margin-bottom: 48px;
+    }
+    .s3-title {
+      font-size: 46px;
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: -1.5px;
+      line-height: 1;
+    }
+    .s3-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--cream-dark);
+      margin-top: 20px;
+    }
+
+    .s3-body {
+      display: flex;
+      gap: 32px;
+      flex: 1;
+      align-items: stretch;
+    }
+
+    .s3-vision {
+      flex: 1;
+      background: var(--navy);
+      border-radius: 20px;
+      padding: 44px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .vm-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+    }
+    .vm-badge::before {
+      content: '';
+      width: 20px;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    .s3-vision-text {
+      font-size: 30px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.3;
+      letter-spacing: -0.5px;
+    }
+    .s3-vision-text span { color: var(--accent); }
+
+    .s3-vision-sub {
+      font-size: 15px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.7;
+    }
+
+    .s3-mission {
+      flex: 1.2;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .mission-label {
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--slate);
+    }
+
+    .mission-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background: #fff;
+      border: 1px solid var(--cream-dark);
+      border-radius: 14px;
+      padding: 20px 24px;
+      flex: 1;
+    }
+    .mission-num {
+      width: 32px;
+      height: 32px;
+      background: var(--navy);
+      color: #fff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .mission-content {}
+    .mission-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+    .mission-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ══════════════════════════════
+       SLIDE 4 — SERVICES
+    ══════════════════════════════ */
+    .s4 {
+      background: var(--cream);
+      flex-direction: column;
+      padding: 56px 64px;
+    }
+
+    .s4-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .s4-title {
+      font-size: 46px;
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: -1.5px;
+    }
+    .s4-sub {
+      font-size: 15px;
+      color: var(--muted);
+      padding-bottom: 4px;
+    }
+
+    .s4-divider {
+      width: 100%;
+      height: 1px;
+      background: var(--cream-dark);
+      margin-bottom: 32px;
+    }
+
+    .s4-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      flex: 1;
+    }
+
+    .service-card {
+      background: #fff;
+      border: 1px solid var(--cream-dark);
+      border-radius: 18px;
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: box-shadow 0.2s;
+    }
+    .service-card:hover {
+      box-shadow: 0 8px 32px rgba(46,61,91,0.1);
+    }
+
+    .service-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 2px;
+    }
+
+    .service-icon {
+      width: 52px;
+      height: 52px;
+      background: var(--navy);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .service-icon svg { width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    .service-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .service-items {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .service-items li {
+      font-size: 14px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .service-items li::before {
+      content: '';
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ══════════════════════════════
+       SLIDE 5 — STRENGTHS
+    ══════════════════════════════ */
+    .s5 {
+      background: var(--navy);
+      flex-direction: column;
+      padding: 56px 64px;
+    }
+
+    .s5-header {
+      margin-bottom: 40px;
+    }
+    .s5-label {
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .s5-title {
+      font-size: 46px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -1.5px;
+    }
+
+    .s5-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      flex: 1;
+      align-items: stretch;
+    }
+
+    .strength-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 18px;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: background 0.2s;
+    }
+    .strength-card:hover {
+      background: rgba(255,255,255,0.09);
+    }
+
+    .strength-num {
+      font-size: 34px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.15);
+      line-height: 1;
+    }
+
+    .strength-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--accent);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .strength-icon svg { width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    .strength-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+    }
+    .strength-desc {
+      font-size: 14px;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.7;
+      margin-top: auto;
+    }
+
+    /* ══════════════════════════════
+       SLIDE 6 — PROCESS
+    ══════════════════════════════ */
+    .s6 {
+      background: var(--cream);
+      flex-direction: column;
+      padding: 56px 64px;
+    }
+
+    .s6-header {
+      margin-bottom: 40px;
+    }
+    .s6-title {
+      font-size: 46px;
+      font-weight: 900;
+      color: var(--navy);
+      letter-spacing: -1.5px;
+    }
+
+    .s6-flow {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      flex: 1;
+    }
+
+    .process-step {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding-right: 24px;
+    }
+    .process-step:last-child { padding-right: 0; }
+
+    .process-connector {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 24px;
+    }
+
+    .process-circle {
+      width: 56px;
+      height: 56px;
+      background: var(--navy);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      z-index: 1;
+    }
+    .process-circle svg { width: 24px; height: 24px; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; }
+    .process-line {
+      flex: 1;
+      height: 2px;
+      background: var(--cream-dark);
+      position: relative;
+    }
+    .process-line::after {
+      content: '';
+      position: absolute;
+      right: -6px;
+      top: -4px;
+      border: 5px solid transparent;
+      border-left: 8px solid var(--cream-dark);
+    }
+    .process-step:last-child .process-line { display: none; }
+    .process-step:last-child .process-circle { background: var(--accent); }
+
+    .process-body {
+      flex: 1;
+      background: #fff;
+      border: 1px solid var(--cream-dark);
+      border-radius: 16px;
+      padding: 24px 22px;
+    }
+
+    .process-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+    .process-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .process-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ══════════════════════════════
+       SLIDE 7 — BENEFITS
+    ══════════════════════════════ */
+    .s7 {
+      background: var(--cream);
+      flex-direction: row;
+    }
+
+    .s7-left {
+      width: 420px;
+      background: var(--navy);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 70px 56px;
+      gap: 28px;
+    }
+
+    .s7-left-label {
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .s7-left-title {
+      font-size: 50px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+    }
+    .s7-left-title span { color: var(--accent); }
+
+    .s7-left-desc {
+      font-size: 16px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.8;
+    }
+
+    .s7-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 100px;
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      width: fit-content;
+      margin-top: 8px;
+    }
+    .s7-cta svg { width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2; }
+
+    .s7-right {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 60px 56px;
+      align-content: center;
+    }
+
+    .benefit-card {
+      background: #fff;
+      border: 1px solid var(--cream-dark);
+      border-radius: 18px;
+      padding: 28px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .benefit-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .benefit-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--navy);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .benefit-icon svg { width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .benefit-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .benefit-bar {
+      height: 4px;
+      background: var(--cream-dark);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .benefit-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--navy-mid), var(--accent));
+      border-radius: 2px;
+    }
+
+    .benefit-percent {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--navy);
+    }
+    .benefit-percent span {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+  <div class="viewport">
+    <div class="slides">
+
+      <!-- ─── SLIDE 1: COVER ─── -->
+      <div class="slide s1 active">
+        <div class="s1-left">
+          <div class="s1-logo">
+            <div class="s1-logo-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <span class="s1-logo-name">SmartAI Marketing</span>
+          </div>
+
+          <div class="s1-center">
+            <div class="s1-badge">AI Marketing Solution</div>
+            <div class="s1-headline">AI로 만드는<br/><span>데이터 기반</span><br/>성장</div>
+            <div class="s1-slogan">AI 마케팅 솔루션 기업</div>
+          </div>
+
+          <div class="s1-footer">
+            <span class="s1-footer-date">2026. 04. 21</span>
+            <span class="s1-footer-sub">Company Overview</span>
+          </div>
+        </div>
+
+        <div class="s1-right">
+          <div class="s1-toc-label">Contents</div>
+          <div class="s1-toc-item"><span class="s1-toc-num">01</span><span class="s1-toc-text">회사 소개 — About Us</span></div>
+          <div class="s1-toc-item"><span class="s1-toc-num">02</span><span class="s1-toc-text">비전 &amp; 미션 — Vision &amp; Mission</span></div>
+          <div class="s1-toc-item"><span class="s1-toc-num">03</span><span class="s1-toc-text">핵심 서비스 — Our Services</span></div>
+          <div class="s1-toc-item"><span class="s1-toc-num">04</span><span class="s1-toc-text">핵심 경쟁력 — Our Strengths</span></div>
+          <div class="s1-toc-item"><span class="s1-toc-num">05</span><span class="s1-toc-text">서비스 프로세스 — Process</span></div>
+          <div class="s1-toc-item"><span class="s1-toc-num">06</span><span class="s1-toc-text">기대 효과 — Benefits</span></div>
+        </div>
+      </div>
+
+      <!-- ─── SLIDE 2: ABOUT US ─── -->
+      <div class="slide s2">
+        <div class="s2-left">
+          <div class="s2-left-top">
+            <div class="section-label">01 — About Us</div>
+            <div class="s2-left-title">회사<br/>소개</div>
+            <div class="s2-left-desc">
+              AI 기술을 활용하여<br/>기업의 성장을 돕는<br/>마케팅 전문 회사입니다.
+            </div>
+          </div>
+          <div class="s2-left-bottom">
+            <div class="s2-stat-row">
+              <div class="s2-stat-item">
+                <div class="s2-stat-num">200<span>+</span></div>
+                <div class="s2-stat-label">파트너사</div>
+              </div>
+              <div class="s2-stat-item">
+                <div class="s2-stat-num">98<span>%</span></div>
+                <div class="s2-stat-label">고객 만족도</div>
+              </div>
+              <div class="s2-stat-item">
+                <div class="s2-stat-num">5<span>년</span></div>
+                <div class="s2-stat-label">업력</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="s2-right">
+          <div>
+            <div class="section-label dark">Company Introduction</div>
+            <div class="s2-heading">SmartAI Marketing은</div>
+          </div>
+          <div class="s2-para">
+            AI 기술을 활용하여 기업의 성장을 돕는 마케팅 전문 회사입니다.<br/>
+            데이터 분석과 자동화를 통해 효율적인 마케팅 전략을 제공하며,<br/>
+            다양한 산업 분야의 고객과 협업하고 있습니다.
+          </div>
+          <div class="s2-cards">
+            <div class="s2-card">
+              <div class="s2-card-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="s2-card-title">빠른 실행</div>
+              <div class="s2-card-text">데이터 기반의 신속한 캠페인 설계 및 실행</div>
+            </div>
+            <div class="s2-card">
+              <div class="s2-card-icon">
+                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <div class="s2-card-title">전문 팀</div>
+              <div class="s2-card-text">마케팅·데이터·개발 전문가 협업 체계</div>
+            </div>
+            <div class="s2-card">
+              <div class="s2-card-icon">
+                <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </div>
+              <div class="s2-card-title">성과 중심</div>
+              <div class="s2-card-text">실시간 KPI 모니터링 및 지속적 최적화</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── SLIDE 3: VISION & MISSION ─── -->
+      <div class="slide s3">
+        <div class="s3-header">
+          <div class="section-label dark">02 — Vision &amp; Mission</div>
+          <div class="s3-title">비전 &amp; 미션</div>
+          <div class="s3-divider"></div>
+        </div>
+
+        <div class="s3-body">
+          <div class="s3-vision">
+            <div class="vm-badge">Vision</div>
+            <div class="s3-vision-text">글로벌 AI 마케팅<br/><span>선도 기업</span>으로 성장</div>
+            <div class="s3-vision-sub">
+              AI와 데이터의 힘으로 경계를 넘어,<br/>
+              전 세계 기업의 성장 파트너가 됩니다.
+            </div>
+          </div>
+
+          <div class="s3-mission">
+            <div class="mission-label">Mission</div>
+            <div class="mission-item">
+              <div class="mission-num">01</div>
+              <div class="mission-content">
+                <div class="mission-title">데이터 기반 의사결정 지원</div>
+                <div class="mission-desc">정확한 데이터 분석으로 마케팅 전략의 불확실성을 제거합니다.</div>
+              </div>
+            </div>
+            <div class="mission-item">
+              <div class="mission-num">02</div>
+              <div class="mission-content">
+                <div class="mission-title">고객 맞춤형 마케팅 제공</div>
+                <div class="mission-desc">개인화된 전략으로 각 고객사에 최적화된 솔루션을 설계합니다.</div>
+              </div>
+            </div>
+            <div class="mission-item">
+              <div class="mission-num">03</div>
+              <div class="mission-content">
+                <div class="mission-title">효율적인 자동화 시스템 구축</div>
+                <div class="mission-desc">반복 업무를 자동화하여 핵심 전략에 집중할 수 있도록 합니다.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── SLIDE 4: SERVICES ─── -->
+      <div class="slide s4">
+        <div class="s4-header">
+          <div>
+            <div class="section-label dark">03 — Our Services</div>
+            <div class="s4-title">핵심 서비스</div>
+          </div>
+          <div class="s4-sub">4가지 핵심 서비스로 마케팅 전 과정을 지원합니다</div>
+        </div>
+        <div class="s4-divider"></div>
+
+        <div class="s4-grid">
+          <div class="service-card">
+            <div class="service-num">01</div>
+            <div class="service-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            </div>
+            <div class="service-title">AI 데이터 분석</div>
+            <ul class="service-items">
+              <li>고객 행동 분석</li>
+              <li>시장 트렌드 예측</li>
+            </ul>
+          </div>
+          <div class="service-card">
+            <div class="service-num">02</div>
+            <div class="service-icon">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            </div>
+            <div class="service-title">맞춤형 마케팅</div>
+            <ul class="service-items">
+              <li>개인화 광고 전략</li>
+              <li>타겟 고객 세분화</li>
+            </ul>
+          </div>
+          <div class="service-card">
+            <div class="service-num">03</div>
+            <div class="service-icon">
+              <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <div class="service-title">광고 자동화</div>
+            <ul class="service-items">
+              <li>AI 기반 광고 운영</li>
+              <li>실시간 성과 최적화</li>
+            </ul>
+          </div>
+          <div class="service-card">
+            <div class="service-num">04</div>
+            <div class="service-icon">
+              <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </div>
+            <div class="service-title">콘텐츠 제작</div>
+            <ul class="service-items">
+              <li>AI 콘텐츠 생성</li>
+              <li>SNS / 블로그 제작</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── SLIDE 5: STRENGTHS ─── -->
+      <div class="slide s5">
+        <div class="s5-header">
+          <div class="s5-label">04 — Our Strengths</div>
+          <div class="s5-title">핵심 경쟁력</div>
+        </div>
+
+        <div class="s5-grid">
+          <div class="strength-card">
+            <div class="strength-num">01</div>
+            <div class="strength-icon">
+              <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div class="strength-title">빠르고 정확한 데이터 분석</div>
+            <div class="strength-desc">AI 엔진으로 수백만 건의 데이터를 실시간 처리</div>
+          </div>
+          <div class="strength-card">
+            <div class="strength-num">02</div>
+            <div class="strength-icon">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="strength-title">비용 절감형 마케팅</div>
+            <div class="strength-desc">불필요한 광고 낭비 없이 최적 ROI 달성</div>
+          </div>
+          <div class="strength-card">
+            <div class="strength-num">03</div>
+            <div class="strength-icon">
+              <svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+            </div>
+            <div class="strength-title">실시간 성과 개선</div>
+            <div class="strength-desc">캠페인 실행 중에도 지속적인 최적화 수행</div>
+          </div>
+          <div class="strength-card">
+            <div class="strength-num">04</div>
+            <div class="strength-icon">
+              <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            </div>
+            <div class="strength-title">다양한 산업 적용 가능</div>
+            <div class="strength-desc">리테일·금융·헬스케어 등 전 산업 지원</div>
+          </div>
+          <div class="strength-card">
+            <div class="strength-num">05</div>
+            <div class="strength-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+            <div class="strength-title">확장 가능한 시스템</div>
+            <div class="strength-desc">비즈니스 성장에 따라 유연하게 스케일업</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── SLIDE 6: PROCESS ─── -->
+      <div class="slide s6">
+        <div class="s6-header">
+          <div class="section-label dark">05 — Service Process</div>
+          <div class="s6-title">서비스 프로세스</div>
+        </div>
+
+        <div class="s6-flow">
+          <div class="process-step">
+            <div class="process-connector">
+              <div class="process-circle">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <div class="process-line"></div>
+            </div>
+            <div class="process-body">
+              <div class="process-num">STEP 01</div>
+              <div class="process-title">데이터 수집</div>
+              <div class="process-desc">고객사 데이터, 시장 데이터, 경쟁사 분석 자료 수집 및 정제</div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-connector">
+              <div class="process-circle">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+              </div>
+              <div class="process-line"></div>
+            </div>
+            <div class="process-body">
+              <div class="process-num">STEP 02</div>
+              <div class="process-title">AI 분석</div>
+              <div class="process-desc">머신러닝 모델로 패턴 탐지, 고객 세그먼트 분류 및 예측</div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-connector">
+              <div class="process-circle">
+                <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              </div>
+              <div class="process-line"></div>
+            </div>
+            <div class="process-body">
+              <div class="process-num">STEP 03</div>
+              <div class="process-title">전략 수립</div>
+              <div class="process-desc">분석 결과 기반 맞춤형 마케팅 전략 및 실행 계획 설계</div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-connector">
+              <div class="process-circle">
+                <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </div>
+              <div class="process-line"></div>
+            </div>
+            <div class="process-body">
+              <div class="process-num">STEP 04</div>
+              <div class="process-title">캠페인 실행</div>
+              <div class="process-desc">자동화 시스템으로 멀티채널 광고 캠페인 동시 운영</div>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="process-connector">
+              <div class="process-circle">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              </div>
+            </div>
+            <div class="process-body">
+              <div class="process-num">STEP 05</div>
+              <div class="process-title">성과 분석 & 개선</div>
+              <div class="process-desc">실시간 KPI 모니터링, 리포트 제공 및 지속적 최적화</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── SLIDE 7: BENEFITS ─── -->
+      <div class="slide s7">
+        <div class="s7-left">
+          <div class="s7-left-label">06 — Benefits</div>
+          <div class="s7-left-title">기대<br/><span>효과</span></div>
+          <div class="s7-left-desc">
+            SmartAI Marketing의 솔루션 도입 후<br/>
+            고객사가 경험한 실질적인 변화입니다.
+          </div>
+          <div class="s7-cta">
+            도입 문의하기
+            <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </div>
+        </div>
+
+        <div class="s7-right">
+          <div class="benefit-card">
+            <div class="benefit-header">
+              <div class="benefit-icon">
+                <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+              <div class="benefit-title">마케팅 비용 절감</div>
+            </div>
+            <div class="benefit-bar"><div class="benefit-bar-fill" style="width:72%"></div></div>
+            <div class="benefit-percent">-35% <span>평균 광고 비용 절감</span></div>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-header">
+              <div class="benefit-icon">
+                <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+              </div>
+              <div class="benefit-title">고객 전환율 증가</div>
+            </div>
+            <div class="benefit-bar"><div class="benefit-bar-fill" style="width:85%"></div></div>
+            <div class="benefit-percent">+52% <span>평균 전환율 향상</span></div>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-header">
+              <div class="benefit-icon">
+                <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              </div>
+              <div class="benefit-title">브랜드 인지도 상승</div>
+            </div>
+            <div class="benefit-bar"><div class="benefit-bar-fill" style="width:78%"></div></div>
+            <div class="benefit-percent">+41% <span>평균 노출 증가</span></div>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-header">
+              <div class="benefit-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              </div>
+              <div class="benefit-title">운영 효율성 향상</div>
+            </div>
+            <div class="benefit-bar"><div class="benefit-bar-fill" style="width:90%"></div></div>
+            <div class="benefit-percent">+68% <span>업무 자동화율</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /slides -->
+  </div><!-- /viewport -->
+
+  <div class="nav-bar">
+    <button class="nav-btn" id="prevBtn">← Prev</button>
+    <span class="slide-counter" id="counter">1 / 7</span>
+    <button class="nav-btn" id="nextBtn">Next →</button>
+    <div class="dots" id="dots"></div>
+  </div>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const counter = document.getElementById('counter');
+  const dotsEl = document.getElementById('dots');
+  let current = 0;
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => go(i));
+    dotsEl.appendChild(d);
+  });
+
+  function go(n) {
+    slides[current].classList.remove('active');
+    dotsEl.children[current].classList.remove('active');
+    current = (n + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dotsEl.children[current].classList.add('active');
+    counter.textContent = (current + 1) + ' / ' + slides.length;
+  }
+
+  document.getElementById('prevBtn').addEventListener('click', () => go(current - 1));
+  document.getElementById('nextBtn').addEventListener('click', () => go(current + 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(current + 1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') go(current - 1);
+  });
+</script>
+</body>
+</html>
