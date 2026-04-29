@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>클로드 코드AI 카드뉴스</title>
+  <link href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #c8c2b2;
+      font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      padding: 32px 0;
+    }
+
+    /* ── 카드 기본 ── */
+    .card {
+      width: min(1080px, 100vw);
+      height: min(1080px, 100vw);
+      flex-shrink: 0;
+      background-color: #ede8dc;
+      background-image: radial-gradient(circle, #c0b8a6 1.5px, transparent 1.5px);
+      background-size: clamp(16px, 2.59vw, 28px) clamp(16px, 2.59vw, 28px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(28px, 4.63vw, 50px);
+    }
+
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      border-radius: clamp(14px, 2.22vw, 24px);
+      border: clamp(2px, 0.28vw, 3px) solid #1a1a1a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(32px, 5.19vw, 56px) clamp(40px, 6.48vw, 70px);
+      text-align: center;
+      gap: clamp(10px, 1.67vw, 18px);
+      overflow: hidden;
+    }
+
+    /* ── 칩 레이블 ── */
+    .chip {
+      font-size: clamp(13px, 2.04vw, 22px);
+      font-weight: 400;
+      color: #777;
+      border: 1.5px solid #bbb;
+      border-radius: 100px;
+      padding: clamp(4px, 0.56vw, 6px) clamp(16px, 2.04vw, 22px);
+      letter-spacing: 0.12em;
+    }
+
+    /* ── 타이포 스케일 ── */
+    .t-hero {
+      font-size: clamp(52px, 9.26vw, 100px);
+      font-weight: 900;
+      font-family: 'Do Hyeon', sans-serif;
+      color: #1a1a1a;
+      line-height: 1.15;
+    }
+
+    .t-xl {
+      font-size: clamp(36px, 6.85vw, 74px);
+      font-weight: 900;
+      color: #1a1a1a;
+      line-height: 1.2;
+    }
+
+    .t-lg {
+      font-size: clamp(28px, 5.19vw, 56px);
+      font-weight: 700;
+      color: #1a1a1a;
+      line-height: 1.25;
+    }
+
+    .t-md {
+      font-size: clamp(20px, 3.7vw, 40px);
+      font-weight: 700;
+      color: #1a1a1a;
+      line-height: 1.35;
+    }
+
+    .t-body {
+      font-size: clamp(16px, 2.96vw, 32px);
+      font-weight: 400;
+      color: #555;
+      line-height: 1.65;
+    }
+
+    .t-green  { color: #00a651; }
+    .t-orange { color: #e07030; }
+    .t-red    { color: #dc3737; }
+
+    /* ── 커버 하이라이트 박스 ── */
+    .hl-box {
+      display: inline-block;
+      border: clamp(2px, 0.28vw, 3px) solid #1a1a1a;
+      border-radius: clamp(6px, 0.93vw, 10px);
+      padding: clamp(2px, 0.37vw, 4px) clamp(18px, 2.41vw, 26px);
+      background: #f0ead8;
+    }
+
+    /* ── 구분선 ── */
+    .divider-wide {
+      width: clamp(160px, 37vw, 400px);
+      height: clamp(5px, 0.74vw, 8px);
+      background: #00a651;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .divider-sm {
+      width: clamp(50px, 11.1vw, 120px);
+      height: clamp(4px, 0.65vw, 7px);
+      background: #00a651;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    /* ── 화살표 ── */
+    .arrow {
+      font-size: clamp(24px, 3.7vw, 40px);
+      color: #1a1a1a;
+    }
+
+    /* ── 베이지 박스 (리스트·강조) ── */
+    .beige-box {
+      width: 100%;
+      background: #f0ead8;
+      border-radius: clamp(8px, 1.3vw, 14px);
+      padding: clamp(18px, 2.78vw, 30px) clamp(22px, 3.52vw, 38px);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(10px, 1.67vw, 18px);
+    }
+
+    /* ── 체크 아이템 ── */
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: clamp(10px, 1.48vw, 16px);
+      text-align: left;
+    }
+
+    .check-icon {
+      color: #e07030;
+      font-size: clamp(20px, 3.15vw, 34px);
+      font-weight: 900;
+      flex-shrink: 0;
+      line-height: 1.4;
+    }
+
+    .check-text {
+      font-size: clamp(20px, 3.15vw, 34px);
+      font-weight: 400;
+      color: #1a1a1a;
+      line-height: 1.45;
+    }
+
+    /* ── 인용구 블록 ── */
+    .quote-block {
+      background: #f0ead8;
+      border-radius: clamp(8px, 1.11vw, 12px);
+      padding: clamp(12px, 1.85vw, 20px) clamp(18px, 2.78vw, 30px);
+      width: 100%;
+    }
+
+    /* ── 챕터 번호 ── */
+    .chapter-num {
+      font-size: clamp(16px, 2.78vw, 30px);
+      font-weight: 700;
+      color: #00a651;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── 두 컬럼 ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(8px, 1.48vw, 16px);
+      width: 100%;
+    }
+
+    .col-box {
+      border-radius: clamp(8px, 1.11vw, 12px);
+      padding: clamp(14px, 2.22vw, 24px) clamp(12px, 1.85vw, 20px);
+      text-align: center;
+    }
+
+    .col-box.neutral  { background: #f0ead8; border: 1.5px solid #ccc5ae; }
+    .col-box.positive { background: #e8f5ee; border: 1.5px solid #00a651; }
+
+    .col-head {
+      font-size: clamp(20px, 3.33vw, 36px);
+      font-weight: 700;
+      padding-bottom: clamp(8px, 1.11vw, 12px);
+      margin-bottom: clamp(10px, 1.48vw, 16px);
+      border-bottom: 1.5px solid currentColor;
+    }
+
+    .col-item {
+      font-size: clamp(16px, 2.41vw, 26px);
+      font-weight: 400;
+      color: #444;
+      line-height: 1.6;
+      margin-bottom: clamp(4px, 0.74vw, 8px);
+    }
+
+    /* ── 알림 바 (CTA) ── */
+    .alert-bar {
+      width: 100%;
+      background: #dc3737;
+      border-radius: clamp(6px, 0.93vw, 10px);
+      padding: clamp(12px, 1.67vw, 18px) clamp(20px, 2.78vw, 30px);
+      color: #fff;
+      font-size: clamp(16px, 2.78vw, 30px);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .cta-text {
+      font-size: clamp(20px, 3.7vw, 40px);
+      font-weight: 700;
+      color: #00a651;
+      line-height: 1.4;
+    }
+
+    .note-box {
+      width: 100%;
+      background: #e8f5ee;
+      border: 1.5px solid #00a651;
+      border-radius: clamp(8px, 1.11vw, 12px);
+      padding: clamp(14px, 2.22vw, 24px) clamp(18px, 2.78vw, 30px);
+      flex-shrink: 0;
+    }
+
+    /* 카드 2번부터 적용 */
+    .card:not(#card-01) .card-inner {
+      background-image: 
+        linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)),
+        url('images/back.png');
+      background-repeat: no-repeat;
+      background-position: 480px 500px;
+      background-size: 80%; /* ← 기존 대비 약 70% 축소 느낌 */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ 카드뉴스 이미지 (커버 상단 좌우) ═══ -->
+  <div style="
+    width: min(1080px, 100vw);
+    display: flex;
+    gap: clamp(10px, 1.85vw, 20px);
+    padding: clamp(28px, 4.63vw, 50px);
+  ">
+    <img src="images/lecture_img.jpg" alt="카드뉴스1" style="
+      flex: 1;
+      min-width: 0;
+      width: 50%;
+      height: auto;
+      display: block;
+    ">
+    
+  </div>
+
+  <!-- ═══ 신청폼 ═══ -->
+  <div class="card" id="card-01" style="height:700px;">
+    <div class="card-inner" style="height:500px;">
+      <span class="chip">생성형 AI 무료 강의</span>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:clamp(2px,0.56vw,6px);">
+        <p class="t-hero" style="font-size:80px;">신청은 아래 신청버튼 클릭</p>
+        <span class="arrow" style="margin-top:clamp(4px,0.74vw,8px);">→</span>
+        <a href="https://forms.gle/8VTm9X8dmA56B4Js9" target="_blank">
+          <p class="t-hero" style="font-size:70px;">
+            <span class="hl-box" style="background-color:#f8caca;"> >> 신청버튼</span>
+          </p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 카드 01 — 커버 ═══ -->
+  <div class="card" id="card-01">
+    <div class="card-inner">
+      <span class="chip">CARD NEWS</span>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:clamp(2px,0.56vw,6px);">
+        <p class="t-hero">아직도</p>
+        <p class="t-hero"><span class="hl-box">생성형 AI</span></p>
+        <p class="t-hero">모른다고?!</p>
+      </div>
+      <span class="arrow" style="margin-top:clamp(4px,0.74vw,8px);">→</span>
+      <p class="t-body">이거 모르면 진짜 끝난다</p>
+    </div>
+  </div>
+
+  <!-- ═══ 카드 02 — 이미 격차가 나기 시작했다 ═══ -->
+  <div class="card" id="card-02">
+    <div class="card-inner">
+      <p class="t-lg" style="font-size:clamp(30px,5.56vw,68px); font-family:'Do Hyeon',sans-serif; ">이미 격차가 나기 시작했다!</p>
+      <div class="beige-box">
+        <div class="check-item">
+          <span class="check-icon" style="font-size:clamp(31px,4.91vw,53px);">✓</span>
+          <span style="font-size:clamp(31px,4.91vw,53px); font-weight:700; color:#1a1a1a; line-height:1.3;">
+            AI 쓰는 사람 vs 안 쓰는 사람
+          </span>
+        </div>
+      </div>
+      <p class="t-body" style="margin-top:clamp(4px,0.56vw,6px);">
+        결과 차이 = <strong style="color:#1a1a1a;">"10배 이상"</strong><br>
+        AI 자동화로 시간 단축
+      </p>
+    </div>
+  </div>
+
+  <!-- ═══ 카드 03 — 지금 바뀐 취업 기준 ═══ -->
+  <div class="card" id="card-03">
+    <div class="card-inner">
+      <p class="t-xl" style="font-family:'Do Hyeon',sans-serif;">지금 바뀐<br>취업 기준</p>
+      <div class="quote-block">
+        <p class="t-md" style="font-size:clamp(31px,4.91vw,53px); font-weight:700; color:#1a1a1a; line-height:1.3;">
+          이젠 AI 활용하는 사람이 이김
+        </p>
+      </div>
+      <p class="t-body">
+        웹,앱 개발 가능해? ❌ 이제 옛말<br>
+        AI 활용력이 곧 경쟁력
+      </p>
+    </div>
+  </div>
+
+ 
+
+  <!-- ═══ 카드 07 — 회사도 AI 적용 시작 ═══ -->
+  <div class="card" id="card-07">
+    <div class="card-inner">
+      <p class="t-xl" style="font-size:clamp(30px,5.56vw,68px); font-family:'Do Hyeon',sans-serif;">회사도<br>AI 적용 시작</p>
+      <div class="quote-block">
+        <p class="t-md" style="font-size:clamp(31px,4.91vw,53px); font-weight:700; color:#1a1a1a; line-height:1.3;">"AI 안 쓰면 대체 후보"</p>
+      </div>
+      <p class="t-body">
+        생산성 차이가 자리를 결정한다<br>
+        지금 준비 안 하면 밀린다
+      </p>
+    </div>
+  </div>
+
+  <!-- ═══ 카드 08 — 대부분 이렇게 망함 ═══ -->
+  <div class="card" id="card-08">
+    <div class="card-inner">
+      <p class="t-lg" style="font-size:clamp(30px,5.56vw,68px); font-family:'Do Hyeon',sans-serif;">대부분 이렇게 망함</p>
+      <div class="beige-box" style="align-items:center;">
+        <div class="check-item" style="justify-content:center;">
+          <span class="check-icon" style="font-size:clamp(26px,4.44vw,48px); color:#dc3737;">✗</span>
+          <span style="font-size:clamp(26px,4.44vw,48px); font-weight:700; color:#1a1a1a; line-height:1.3;">
+            "나중에 해야지..."
+          </span>
+        </div>
+      </div>
+      <div class="beige-box" style="gap:clamp(6px,0.93vw,10px);">
+        <div class="check-item">
+          <span class="check-icon" style="color:#dc3737;">→</span>
+          <span class="check-text">계속 뒤로 밀림</span>
+        </div>
+        <div class="check-item">
+          <span class="check-icon" style="color:#dc3737;">→</span>
+          <span class="check-text">결국 아무것도 못 함</span>
+        </div>
+        <div class="check-item">
+          <span class="check-icon" style="color:#dc3737;">→</span>
+          <span class="check-text">기회는 사라진다</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══ 카드 10 — CTA ═══ -->
+  <div class="card" id="card-10">
+    <div class="card-inner">
+      <div class="alert-bar">지금 아니면 늦습니다</div>
+      <p class="t-xl" style="font-size:clamp(30px,5.56vw,68px); font-family:Noto Sans KR, sans-serif;">강의 커리큘럼</p>
+      <br>
+      <div class="note-box">
+        <p class="t-body" style="color:#1a1a1a; font-size:20px;" >
+          [ 업무 관련 ]<br>
+회의록,필기,레포트 문서작업,보고서,제무제표 먀자동화 구현<br>
+이메일 발송, 카톡 발송, 스케줄 관리, AI 자동화 구현<br>
+마케팅제안, 기획서 작성, 데이터 분석, 웹스크래핑, 웹페이지자동화 구현<br><br>
+[ 제작 관련 ]<br>
+PPT디자인, 웹앱 디자인가이드, 웹 인터넷 배포 구현<br>
+숏폼/롱폼 스크립트, 유튜브 내용정리 노션저장<br>
+인스타그램 자동업로드, 음성녹음, 영상편집, 자막 영상 제작 AI자동화 구현<br><br>
+[ AI전문 스킬 ] - 2주후 심화과정<br>
+요구사항분석, PRD 작성, AI설계, 메뉴구조도, 화면설계, 파일구성<br>
+CLAUDE.md/SKILLS.md 구현
+plan mode, 구현검증, MCP를 이용한 타 프로그램 연동<br>
+AI Agent 활용, 데이터 베이스 연결<br>
+프로젝트 진행
+        </p>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
