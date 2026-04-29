@@ -245,12 +245,23 @@
 
     /* 카드 2번부터 적용 */
     .card:not(#card-01) .card-inner {
-      background-image: 
+      background-image:
         linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)),
         url('images/back.png');
       background-repeat: no-repeat;
-      background-position: 480px 500px;
-      background-size: 80%; /* ← 기존 대비 약 70% 축소 느낌 */
+      background-position: 44% 46%;
+      background-size: 80%;
+    }
+
+    /* ── 반응형 ── */
+    @media (max-width: 768px) {
+      body { padding: 16px; gap: 16px; }
+      .two-col { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .card { height: auto !important; }
+      .card-inner { height: auto !important; min-height: 0 !important; }
     }
   </style>
 </head>
@@ -274,14 +285,14 @@
   </div>
 
   <!-- ═══ 신청폼 ═══ -->
-  <div class="card" id="card-01" style="height:700px;">
-    <div class="card-inner" style="height:500px;">
+  <div class="card" id="card-01" style="height: clamp(300px, 65vw, 700px);">
+    <div class="card-inner">
       <span class="chip">생성형 AI 무료 강의</span>
       <div style="display:flex; flex-direction:column; align-items:center; gap:clamp(2px,0.56vw,6px);">
-        <p class="t-hero" style="font-size:80px;">신청은 아래 신청버튼 클릭</p>
+        <p class="t-hero" style="font-size: clamp(28px, 7.41vw, 80px);">신청은 아래 신청버튼 클릭</p>
         <span class="arrow" style="margin-top:clamp(4px,0.74vw,8px);">→</span>
         <a href="https://forms.gle/8VTm9X8dmA56B4Js9" target="_blank">
-          <p class="t-hero" style="font-size:70px;">
+          <p class="t-hero" style="font-size: clamp(24px, 6.48vw, 70px);">
             <span class="hl-box" style="background-color:#f8caca;"> >> 신청버튼</span>
           </p>
         </a>
@@ -391,7 +402,7 @@
       <p class="t-xl" style="font-size:clamp(30px,5.56vw,68px); font-family:Noto Sans KR, sans-serif;">강의 커리큘럼</p>
       <br>
       <div class="note-box">
-        <p class="t-body" style="color:#1a1a1a; font-size:20px;" >
+        <p class="t-body" style="color:#1a1a1a; font-size: clamp(12px, 1.85vw, 20px);" >
           [ 업무 관련 ]<br>
 회의록,필기,레포트 문서작업,보고서,제무제표 AI자동화 구현<br>
 이메일 발송, 카톡 발송, 스케줄 관리, AI 자동화 구현<br>
